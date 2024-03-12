@@ -1,0 +1,14 @@
+.home {
+  background-image: url(../../../assets/home.jpg);
+  height: 94.6svh;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.heading {
+  position: absolute;
+  top: 217px;
+  left: 116px;
+}
+.title {
+  font-size: 40px;
+}

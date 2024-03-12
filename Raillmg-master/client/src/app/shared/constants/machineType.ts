@@ -1,0 +1,21 @@
+export const machineType = [
+    "BCM",
+    "BRM",
+    "CSM",
+    "DGS",
+    "DTE",
+    "DUO",
+    "DUOMATIC",
+    "LADDER",
+    "MPT",
+    "PBR",
+    "PQRS",
+    "SBCM",
+    "T",
+    "TOWER WAGON",
+    "UNIMAT",
+    "UTV",
+    "WIRING TRAIN",
+    "MAST ERECTION TRAIN",
+    "Others"
+]

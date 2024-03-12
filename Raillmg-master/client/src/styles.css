@@ -1,0 +1,83 @@
+@import "handsontable/dist/handsontable.min.css";
+tr td:nth-of-type(even) {
+  background: transparent;
+  color: #000 !important;
+}
+tr td:nth-of-type(odd) {
+  background: transparent;
+  color: #000 !important;
+}
+.user-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+tr:nth-child(even) {
+  background: #fff !important;
+}
+
+tr:nth-child(odd) {
+  background: rgba(208, 208, 208, 0.752) !important;
+}
+
+.handsontable table thead th {
+  font-weight: bold;
+  font-size: 12px;
+  background-color: rgb(70, 70, 224);
+  color: #fff;
+}
+
+.handsontable .wraptext {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.htCommentsContainer .htCommentTextArea {
+  width: 400px !important;
+  height: 200px !important;
+}
+
+.editCell {
+  background: lightblue !important;
+}
+
+.evenCell {
+  background-color: rgba(208, 208, 208, 0.752) !important;
+  color: black !important;
+}
+.oddCell {
+  color: black !important;
+}
+
+.handsontable {
+  text-align: center;
+}
+
+.handsontable .changeType {
+  background-color: transparent;
+  width: 20px;
+  height: 20px;
+}
+
+.handsontable thead th.ht__highlight {
+  background-color: blue;
+}
+
+.htUIMultipleSelect .ht_master .wtHolder {
+  text-align: left !important;
+  /* overflow-y: scroll; */
+}
+/* .handsontable thead th:nth-child(4) {
+  background-color: rgb(223, 67, 67) !important;
+}
+.handsontable thead th:nth-child(8) {
+  background-color: rgb(223, 67, 67) !important;
+}
+.handsontable thead th:nth-child(9) {
+  background-color: rgb(223, 67, 67) !important;
+} 
+ .handsontable thead th:nth-child(14) {
+  background-color: rgb(223, 67, 67) !important;
+}  */

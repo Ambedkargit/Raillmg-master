@@ -1,0 +1,42 @@
+<div class="user-details container-fluid">
+    <div class="mt-5">
+        <form>
+            <div class="mb-3 row">
+                <label class="col-xs-3 col-sm-auto col-form-label">SEARCH:</label>
+                <div class="col-xs-3 col-sm-auto">
+                    <input id="table-filtering-search" class="form-control" type="text"
+                        (change)="filterInput($event)" />
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="user-table">
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">USERNAME</th>
+                    <th scope="col">DEPARTMENT</th>
+                    <th scope="col">DESIGNATION</th>
+                    <th scope="col">DELETE</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (user of userData; track user._id; let i = $index) {
+                <tr>
+                    <th scope="row">{{ i + 1 }}</th>
+                    <td><ngb-highlight [result]="user.username" [term]="filterTxt" /></td>
+                    <td><ngb-highlight [result]="user.department" [term]="filterTxt" /></td>
+                    <td><ngb-highlight [result]="user.designation" [term]="filterTxt" /></td>
+                    <td><button class="btn btn-outline-danger" (click)="onDeleteUser(user)">x</button></td>
+                </tr>
+                } @empty {
+                <tr>
+                    <td colspan="4" style="text-align: center">No Users found</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,5 @@
+.user-table {
+  height: 70svh;
+  overflow-y: scroll;
+  scroll-behavior: smooth;
+}

@@ -1,0 +1,18 @@
+.slotFormat {
+  color: red;
+}
+.rolls {
+  overflow: hidden;
+}
+.slot-data {
+  color: white;
+  background: rgb(87, 87, 234);
+  border-radius: 10px;
+  box-shadow: 2px;
+}
+.required::after {
+  content: '*';
+  color: red;
+  margin-right: 10px;
+  font-size: 1.5em;
+}

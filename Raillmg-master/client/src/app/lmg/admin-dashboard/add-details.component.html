@@ -1,0 +1,410 @@
+<div class="m-3">
+  <div class="row">
+    <div class="">
+      <div ngbNav #nav="ngbNav" [(activeId)]="active" class="nav-pills">
+        <ng-container ngbNavItem="board">
+          <button ngbNavLink (click)="onTabChange()">BOARD</button>
+          <ng-template ngbNavContent>
+            <div class="row ">
+              <div class="col-6 AddDetails">
+                <label>BOARD</label>
+                <input id="typeahead-format" class="form-control mt-3 mb-3" type="text" name="board"
+                  (change)="onSelectBoard($event)" />
+                <button class="btn btn-primary form-control mt-3" (click)="addBoard()">ADD</button>
+              </div>
+              <div class="col-6">
+                <div class="row">
+                  <div class="col-8">
+
+                    <h3 class="">Already added BOARD</h3>
+                  </div>
+                  <div class="col-4 d-flex">
+                    <div class="me-3 ms-3">EDIT</div>
+                    <div class="">DELETE</div>
+                  </div>
+                </div>
+                <ol class="fs-5">
+                  @for(item of boardDataset; track $index){
+                  <li>
+                    <div class="row">
+                      <div class="col-8">
+
+                        {{item.board}}
+                      </div>
+                      <div class="col-4">
+
+                        <button class="btn btn-success me-3" (click)="editBoard(item)">edit</button>
+                        <button class="btn btn-outline-danger" (click)="onDeleteBoard(item)">x</button>
+                      </div>
+                    </div>
+
+                  </li>
+                  }
+                </ol>
+              </div>
+            </div>
+
+          </ng-template>
+        </ng-container>
+
+        <ng-container ngbNavItem="section">
+          <button ngbNavLink (click)="onTabChange()">SECTION</button>
+          <ng-template ngbNavContent>
+            <div class="row ">
+              <div class="col-6 AddDetails">
+                <div class="form-group">
+                  <label>BOARD</label>
+                  <select class="form-select mt-3 mb-3" (change)="onSelectBoard($event)">
+                    <option value="" selected disabled>SELECT BOARD</option>
+                    @for(board of boardList; track $index){
+                    <option value="{{board}}">{{board}}</option>
+                    }
+                  </select>
+                </div>
+                <label>SECTION</label>
+                <input id="typeahead-format" type="text" class="form-control mt-3 mb-3" name="section"
+                  (change)="onSelectSection($event)" />
+                <button class="btn btn-primary form-control mt-3" (click)="addSection()">ADD</button>
+              </div>
+              <div class="col-6">
+                <div class="row">
+                  <div class="col-8">
+
+                    <h3 class="">SECTION under: {{board}}</h3>
+                  </div>
+                  <div class="col-4 d-flex">
+                    <div class="me-3 ms-3">EDIT</div>
+                    <div class="">DELETE</div>
+                  </div>
+                </div>
+                <ol class="fs-5">
+                  @for(item of dataSet; track $index){
+                  @if(item.board===board){
+                  <li>
+
+                    <div class="row">
+                      <div class="col-8">
+
+                        {{item.section}}
+                      </div>
+                      <div class="col-4">
+
+                        <button class="btn btn-success me-3" (click)="editSection(item, $index)">edit</button>
+                        <button class="btn btn-outline-danger"
+                          (click)="onDeleteSection(item._id, item.section)">x</button>
+                      </div>
+                    </div>
+                  </li>
+                  }
+                  }
+                </ol>
+              </div>
+            </div>
+          </ng-template>
+        </ng-container>
+
+        <ng-container ngbNavItem="station">
+          <button ngbNavLink (click)="onTabChange()">STATION</button>
+          <ng-template ngbNavContent>
+            <div class="row ">
+              <div class="col-6 AddDetails">
+                <div class="form-group">
+                  <label>BOARD</label>
+                  <select class="form-select mt-3 mb-3" (change)="onSelectBoard($event)">
+                    <option value="" selected disabled>SELECT BOARD</option>
+                    @for(board of boardList; track $index){
+                    <option value="{{board}}">{{board}}</option>
+                    }
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>SECTION</label>
+                  <select class="form-select mt-3 mb-3" (change)="onSelectSection($event)">
+                    @for(section of sectionList; track $index){
+                    <option value="{{section}}">{{section}}</option>
+                    }
+                  </select>
+                </div>
+                <label>STATION</label>
+                <input id="typeahead-format" class="form-control mt-3 mb-3" type="text" name="station"
+                  [(ngModel)]="station" />
+                <button class="btn btn-primary form-control mt-3" (click)="addStation()">ADD</button>
+              </div>
+              <div class="col-6">
+                <div class="row">
+                  <div class="col-8">
+
+                    <h3 class="">STATION under Board: {{board}} | {{section}}</h3>
+                  </div>
+                  <div class="col-4 d-flex">
+                    <div class="me-3 ms-3">EDIT</div>
+                    <div class="">DELETE</div>
+                  </div>
+                </div>
+                <ol class="fs-5">
+                  @for(station of sectionSelected['stations']; track $index){
+                  <li>
+                    <div class="row">
+                      <div class="col-8">
+
+                        {{station}}
+                      </div>
+                      <div class="col-4">
+
+                        <button class="btn btn-success me-3" (click)="editStation(station,$index)">edit</button>
+                        <button class="btn btn-outline-danger" (click)="onDeleteStation(station)">x</button>
+                      </div>
+                    </div>
+                  </li>
+                  }
+                </ol>
+              </div>
+            </div>
+          </ng-template>
+        </ng-container>
+
+        <ng-container ngbNavItem="slot">
+          <button ngbNavLink (click)="onTabChange()">SLOT</button>
+          <ng-template ngbNavContent>
+            <div class="row ">
+              <div class="col-6 avlslot">
+                <div class="form-group">
+                  <label>BOARD</label>
+                  <select class="form-select mt-3 mb-3" (change)="onSelectBoard($event)" required>
+                    <option value="" selected disabled>SELECT BOARD</option>
+                    @for(board of boardList; track $index){
+                    <option value="{{board}}">{{board}}</option>
+                    }
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>SECTION</label>
+                  <select class="form-select mt-3 mb-3" (change)="onSelectSection($event)" [(ngModel)]="section"
+                    required>
+                    @for(section of sectionList; track $index){
+                    <option value="{{section}}">{{section}}</option>
+                    }
+                  </select>
+                </div>
+                <div class="">
+                  <div class="">DIRECTION</div>
+                  @for (item of directions; track $index) {
+                  <input type="checkbox" class="btn-check" id='{{$index}}' [(ngModel)]="directions[$index]['checked']">
+                  <label class="btn btn-outline-primary ms-3" for={{$index}}>{{item['direction'] | uppercase}}</label>
+                  }
+                </div>
+                <label>AVAILABLE SLOT</label>
+                <br>
+                <div class="avl-slot">
+                  <hr>
+                  <div class="">
+                    @for (direction of directions; track $index) {
+                    @if(direction['checked']){
+                    <div class="">
+                      <h3 class="">{{direction['direction'] | uppercase}}</h3>
+                      <div class="">Repeat on</div>
+                      <input type="checkbox" class="btn-check" id="Sunday{{selectedAvl}}{{$index}}"
+                        [(ngModel)]="direction.days[0]">
+                      <label class="btn btn-outline-primary ms-3" for="Sunday{{selectedAvl}}{{$index}}">S</label>
+                      <input type="checkbox" class="btn-check" id="Monday{{selectedAvl}}{{$index}}"
+                        [(ngModel)]="direction.days[1]">
+                      <label class="btn btn-outline-primary ms-3" for="Monday{{selectedAvl}}{{$index}}">M</label>
+                      <input type="checkbox" class="btn-check" id="Tuesday{{selectedAvl}}{{$index}}"
+                        [(ngModel)]="direction.days[2]">
+                      <label class="btn btn-outline-primary ms-3" for="Tuesday{{selectedAvl}}{{$index}}">T</label>
+                      <input type="checkbox" class="btn-check" id="Wednesday{{selectedAvl}}{{$index}}"
+                        [(ngModel)]="direction.days[3]">
+                      <label class="btn btn-outline-primary ms-3" for="Wednesday{{selectedAvl}}{{$index}}">W</label>
+                      <input type="checkbox" class="btn-check" id="Thursday{{selectedAvl}}{{$index}}"
+                        [(ngModel)]="direction.days[4]">
+                      <label class="btn btn-outline-primary ms-3" for="Thursday{{selectedAvl}}{{$index}}">T</label>
+                      <input type="checkbox" class="btn-check" id="Friday{{selectedAvl}}{{$index}}"
+                        [(ngModel)]="direction.days[5]">
+                      <label class="btn btn-outline-primary ms-3" for="Friday{{selectedAvl}}{{$index}}">F</label>
+                      <input type="checkbox" class="btn-check" id="Saturday{{selectedAvl}}{{$index}}"
+                        [(ngModel)]="direction.days[6]">
+                      <label class="btn btn-outline-primary ms-3" for="Saturday{{selectedAvl}}{{$index}}">S</label>
+                      <div class="mt-3">Timing</div>
+                      <div class="row">
+                        <div class="col-6">
+                          <label>Start:</label>
+                          <ngb-timepicker [(ngModel)]="direction['start']" />
+                        </div>
+                        <div class="col-6">
+                          <label>end:</label>
+                          <ngb-timepicker [(ngModel)]="direction['end']" />
+                        </div>
+                      </div>
+                      <hr>
+                    </div>
+                    }
+                    }
+                  </div>
+                </div>
+                <button type="button" class="btn btn-primary form-control" (click)="onSubmitAvl()">ADD</button>
+              </div>
+              <div class="col-6">
+                <div class="row">
+                  <div class="col-9">
+
+                    <h3 class="">AVAILABLE SLOT under {{board}}: {{section}}</h3>
+                  </div>
+                  <div class="col-3">
+                    <div class="">DELETE</div>
+                  </div>
+                </div>
+                <ol class="fs-5">
+                  @for(ele of sectionSelected['slots'] | keyvalue; track $index){
+                  <li>
+                    <div class="row">
+                      <div class="col-9">
+                        <div class="">
+                          <h3>{{ele.key}}</h3>
+                        </div>
+                        @for(slot of ele.value| keyvalue; track $index){
+                        <ul class="list-group">
+
+                          <li class="list-group-item">
+                            <ul>
+                              @for(ele of slot.value| keyvalue; track $index){
+                              <li class="list-group-item">
+                                {{ele.value}}
+                              </li>
+                              }
+                            </ul>
+                          </li>
+                        </ul>
+                        }
+                      </div>
+                      <div class="col-3">
+                        <button class="btn btn-outline-danger" (click)="onDeleteAvlSlot(ele.key)">x</button>
+                      </div>
+                    </div>
+                  </li>
+                  <hr>
+                  }
+                </ol>
+              </div>
+            </div>
+          </ng-template>
+        </ng-container>
+
+        <ng-container ngbNavItem="mps">
+          <button ngbNavLink (click)="onTabChange()">MPS</button>
+          <ng-template ngbNavContent>
+            <div class="row ">
+              <div class="col-6 AddDetails">
+                <div class="form-group">
+                  <label>BOARD</label>
+                  <select class="form-select mt-3 mb-3" (change)="onSelectBoard($event)">
+                    <option value="" selected disabled>SELECT BOARD</option>
+                    @for(board of boardList; track $index){
+                    <option value="{{board}}">{{board}}</option>
+                    }
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>SECTION</label>
+                  <select class="form-select mt-3 mb-3" (change)="onSelectSection($event)">
+                    @for(section of sectionList; track $index){
+                    <option value="{{section}}">{{section}}</option>
+                    }
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>STATION</label>
+
+                  <select class="form-select mt-3 mb-3" (change)="onSelectStation($event)">
+                    <option value="" selected disabled>SELECT STATION</option>
+                    @for(item of stationList; track $index){
+                    <option value="{{item |json}}">{{item.station}}</option>
+                    }
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>MPS</label>
+                  <input id="typeahead-format" class="form-control mt-3 mb-3" type="number" name="mps"
+                    [(ngModel)]="mps" />
+                </div>
+                <button class="btn btn-primary form-control mt-3" (click)="addMPS()">ADD</button>
+              </div>
+              <div class="col-6">
+                <div class="row">
+                  <div class="col-8">
+
+                    <h3 class="">MPS – Maximum Permission Speed under {{board}} : {{section}} :
+                      {{stationSelected.station}}</h3>
+                  </div>
+                  <div class="col-4 d-flex">
+                    <div class="me-3 ms-3">EDIT</div>
+                    <div class="">DELETE</div>
+                  </div>
+                </div>
+                <ol class="fs-5">
+                  @if(stationSelected.mps){
+                  <li>
+                    <div class="row">
+                      <div class="col-8">
+                        {{stationSelected.mps}} km/hr
+                      </div>
+                      <div class="col-4">
+                        <button class="btn btn-success me-3" (click)="addMPS(false, true)">edit</button>
+                        <button class="btn btn-outline-danger" (click)="addMPS(false)">x</button>
+                      </div>
+                    </div>
+                  </li>
+                  }
+
+                </ol>
+              </div>
+            </div>
+          </ng-template>
+        </ng-container>
+
+
+        <ng-container ngbNavItem="machine">
+          <button ngbNavLink (click)="onTabChange()">MACHINE</button>
+          <ng-template ngbNavContent>
+            <div class="row">
+              <div class="col-6 AddDetails">
+                <label>MACHINE</label>
+                <input id="typeahead-format" class="form-control mt-3 mb-3" type="text" name="machine"
+                  [(ngModel)]="machine" />
+                <button class="btn btn-primary form-control mt-3" (click)="addMachine()">ADD</button>
+              </div>
+              <div class="col-6">
+                <div class="row">
+                  <div class="col-8">
+                    <h3 class="">MACHINES</h3>
+                  </div>
+                  <div class="col-4 d-flex">
+                    <div class="me-3 ms-3">EDIT</div>
+                    <div class="">DELETE</div>
+                  </div>
+                </div>
+                <ol class="fs-5">
+                  @for(item of machineList; track $index){
+                  <li>
+                    <div class="row">
+                      <div class="col-8">
+
+                        {{item.machine}}
+                      </div>
+                      <div class="col-4">
+
+                        <button class="btn btn-success me-3" (click)="editMachine(item, $index)">edit</button>
+                        <button class="btn btn-outline-danger" (click)="onDeleteMachine(item)">x</button>
+                      </div>
+                    </div>
+                  </li>
+                  }
+                </ol>
+              </div>
+            </div>
+          </ng-template>
+        </ng-container>
+      </div>
+      <div [ngbNavOutlet]="nav" class="ms-4"></div>
+    </div>
+  </div>
+</div>

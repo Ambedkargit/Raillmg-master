@@ -1,0 +1,21 @@
+<div class="pt-5">
+    <input type="radio" class="btn-check" id='machineRolls' name="roll" [routerLink]="['./','machineRolls']">
+    <label class="btn btn-outline-primary ms-3" for='machineRolls'>MACHINE ROLLS</label>
+
+    <input type="radio" class="btn-check" id='machineNonRolls' name="roll" [routerLink]="['./','machineNonRolls']">
+    <label class="btn btn-outline-primary ms-3" for='machineNonRolls'>MACHINE OUT OF ROLLING BLOCK</label>
+
+    <input type="radio" class="btn-check" id='maintenanceRolls' name="roll" [routerLink]="['./','maintenanceRolls']">
+    <label class="btn btn-outline-primary ms-3" for='maintenanceRolls'>MAINTENANCE ROLLS</label>
+
+    <input type="radio" class="btn-check" id='maintenanceNonRolls' name="roll"
+        [routerLink]="['./','maintenanceNonRolls']">
+    <label class="btn btn-outline-primary ms-3" for='maintenanceNonRolls'>MAINTENANCE OUT OF ROLLING BLOCK</label>
+
+    <input type="radio" class="btn-check" id='all-rolling' name="roll" [routerLink]="['./','all-rolling']">
+    <label class="btn btn-outline-primary ms-3" for='all-rolling'>ALL ROLLING</label>
+
+    <input type="radio" class="btn-check" id='all-non-rolling' name="roll" [routerLink]="['./','all-non-rolling']">
+    <label class="btn btn-outline-primary ms-3" for='all-non-rolling'>ALL NON ROLLING</label>
+</div>
+<router-outlet></router-outlet>

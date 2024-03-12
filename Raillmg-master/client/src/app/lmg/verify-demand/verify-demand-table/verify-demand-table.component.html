@@ -1,0 +1,25 @@
+<div class="mt-3">
+    <h3 class="text-center">{{domain | uppercase}} DEMAND</h3>
+    <div class="row mb-3 w-100">
+        <div class="col-2">
+            <h4 class="text-end fw-semibold">Filter:</h4>
+        </div>
+        <div class="col-3">
+            <label>From: </label>
+            <input type="date" (change)="selectStartDate($event)" class="form-control">
+        </div>
+        <div class="col-3">
+            <label>To: </label>
+            <input type="date" (change)="selectEndDate($event)" class="form-control">
+        </div>
+        <div class="col-2">
+            <button class="btn btn-primary" (click)="filterDataWithDate()">Submit</button>
+        </div>
+        <div class="col-2">
+            <button class="btn btn-primary" (click)="ResetDates()">Reset</button>
+        </div>
+    </div>
+    <hot-table class="hot" [hotId]="id" [settings]="hotSettings" licenseKey="non-commercial-and-evaluation">
+    </hot-table>
+    <hr>
+</div>

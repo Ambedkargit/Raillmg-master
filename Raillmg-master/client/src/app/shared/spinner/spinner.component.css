@@ -1,0 +1,14 @@
+.overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.333);
+  position: absolute;
+  width: 100%;
+  z-index: 999;
+}
+.spinner-border {
+  width: 6rem;
+  height: 6rem;
+}

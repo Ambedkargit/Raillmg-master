@@ -1,0 +1,156 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top shadow">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="./">LMG DIVISION</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+      aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse navStyle justify-content-between h-25" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Demand
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['demand', 'machine-roll']">Machine(Roll)</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['demand', 'maintenance-roll']">maintenance(Roll)</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['demand', 'machine-non-roll']">Machine(Out of Rolling Block)</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['demand', 'maintenance-non-roll']">maintenance(Out of Rolling Block)</a>
+            </li>
+            <!-- <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['demand', 'machine-upload-file']">Machine(Upload File)</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">maintenance(Upload
+                File)</a>
+            </li> -->
+          </ul>
+        </li>
+        <li>
+          <a class="nav-link active" role="button" [routerLink]="['verify-demand']">
+            Verify Demand
+          </a>
+        </li>
+        <!-- <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Output
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">All</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">Rolling</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">Non-Rolling</a>
+            </li>
+          </ul>
+        </li> -->
+        <!-- <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Reports
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['report', 'machineRolls']">Machine Roll</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['report', 'machineNonRolls']">Machine
+                Non-Rolling</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['report', 'maintenanceRolls']">maintenance
+                Roll</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['report', 'maintenanceNonRolls']">maintenance
+                Non-Roll</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown">Block summary</a>
+            </li>
+          </ul>
+        </li> -->
+        <li class="nav-item">
+          <a class="nav-link active" role="button" [routerLink]="['report']">
+            Report
+          </a>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Edit
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['edit', 'machineRolls']">Machine Roll</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['edit', 'maintenanceRolls']">Maintenance
+                Roll</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['edit', 'machineNonRolls']">Machine (Out of Rolling Block)</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['edit', 'maintenanceNonRolls']">Maintenance (Out of Rolling Block)</a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a class="nav-link active" role="button">
+            Analytics
+          </a>
+        </li>
+        @if(userData['department']==='OPERATING'){
+        <li class="nav-item ">
+          <a class="nav-link  active" role="button" [routerLink]="['dashboard']">
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item ">
+          <a class="nav-link  active" role="button" [routerLink]="['users-details']">
+            Users Details
+          </a>
+        </li>
+        }
+        @if(userData["username"]==='SRDOM' || userData["username"]==='Ambedkar' ){
+          <li class="nav-item ">
+            <a class="nav-link  active" role="button" [routerLink]="['sign']">
+               Digital Sign
+            </a>
+          </li>
+        }
+      </ul>
+      
+
+      <div class="">
+        <label>Name: <b>{{ userData["username"] | uppercase }}</b> 
+          Department:<b> {{ userData["department"] | uppercase }}</b></label>
+        <button class="btn btn-outline-dark rounded ms-5" (click)="onLogout()">
+          Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+</nav>

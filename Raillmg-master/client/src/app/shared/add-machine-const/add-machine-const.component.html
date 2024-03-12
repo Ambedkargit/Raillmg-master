@@ -1,0 +1,621 @@
+<div class="container rolls">
+    <!-- ngNativeValidate -->
+    <form [formGroup]="form" ngNativeValidate (submit)="onSubmit()">
+        <div class="row text-center">
+            <div class="col">
+                <h3>DEMAND FOR {{domainData[domain]}} BLOCK</h3>
+            </div>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-auto me-auto">
+                @if(userData.department==='OPERATING'){
+                <div class="form-group mt-3 mb-3" ngbPopover="Delete/Close all added form for enable"
+                    triggers="mouseenter:mouseleave" popoverTitle="DEPARTMENT">
+                    <label>DEPARTMENT</label>
+                    <select class="form-select" formControlName="department" placement="end">
+                        <option value="CONSTRUCTION">CONSTRUCTION</option>
+                        <option value="ENGINEERING">ENGINEERING</option>
+                        <!-- <option value="S&T">S&T</option> -->
+                        <!-- <option value="ELECTRIC">ELECTRIC</option> -->
+                        <!-- <option value="RE">RE</option> -->
+                        <!-- <option value="RVNL">RVNL</option> -->
+                        <!-- <option value="Telecom">Telecom</option> -->
+                        <option value="SIGNAL">SIGNAL</option>
+                        <option value="TRD">TRD</option>
+                        <option value="IRCON-PKG2 (BPB)">IRCON-PKG2 (BPB)</option>
+                        <option value="IRCON-PKG6 (LMG-FKG)">IRCON-PKG6 (LMG-FKG)</option>
+                        <option value="RITES-(LMG-BPB)">RITES-(LMG-BPB)</option>
+                        <option value="RECON-(HJI-LMG & CPK-HJI)">RECON-(HJI-LMG & CPK-HJI)</option>
+
+                    </select>
+                </div>
+                }@else {
+                <div class="form-group mt-3 mb-3">
+                    <label>DEPARTMENT</label>
+                    <select class="form-select" formControlName="department" placement="end">
+                        <option value="CONSTRUCTION">CONSTRUCTION</option>
+                        <option value="ENGINEERING">ENGINEERING</option>
+                        <option value="SIGNAL">SIGNAL</option>
+                        <option value="TRD">TRD</option>
+                        <option value="IRCON-PKG2 (BPB)">IRCON-PKG2 (BPB)</option>
+                        <option value="IRCON-PKG6 (LMG-FKG)">IRCON-PKG6 (LMG-FKG)</option>
+                        <option value="RITES-(LMG-BPB)">RITES-(LMG-BPB)</option>
+                        <option value="RECON-(HJI-LMG & CPK-HJI)">RECON-(HJI-LMG & CPK-HJI)</option>
+                        <!-- <option value="S&T">S&T</option>
+                        <option value="ELECTRIC">ELECTRIC</option>
+                        <option value="RE">RE</option>
+                        <option value="RVNL">RVNL</option>
+                        <option value="SIGNAL">SIGNAL</option>
+                        <option value="Telecom">Telecom</option>
+                        <option value="TRD">TRD</option> -->
+                    </select>
+                </div>
+                }
+            </div>
+
+            <div class="col-auto">
+                <button type="button" class="btn btn-primary btn-lg me-2" (click)="onAddNewForm()">
+                    Add
+                </button>
+                <button class="btn btn-success btn-lg me-2" type="submit">
+                    Submit
+                </button>
+            </div>
+        </div>
+
+        <div class="accordion" id="accordionPanelsStayOpenExample" formArrayName="machineFormArray">
+            <ng-container *ngFor="let item of machineFormArray.controls; let i = index">
+                <div class="accordion-item mb-2">
+                    <h2 class="accordion-header d-flex">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                            [attr.data-bs-target]="'#collapse' + i" aria-expanded="true"
+                            [attr.aria-controls]="'collapse' + i">
+                            {{ department.value }}-{{ i + 1 }}
+                        </button>
+                        <button type="button" class="btn btn-outline-danger ms-2" (click)="onDelete(i)">
+                            Delete
+                        </button>
+                    </h2>
+                    <div [id]="'collapse' + i" class="accordion-collapse collapse show">
+                        <div class="accordion-body">
+                            <div [formGroupName]="i">
+                                <div class="row">
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label class="required">BOARD</label>
+                                            <select class="form-select" formControlName="board"
+                                                (change)="onBoardSelect(i,$event)" required>
+                                                <option value="" selected disabled>SELECT BOARD</option>
+                                                @for(item of boardList; track $index){
+                                                <option value="{{ item.board }}">{{ item.board }}</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label class="required">SECTION</label>
+                                            <select class="form-select" formControlName="section"
+                                                (change)="onSectionSelect(i,$event)" required>
+                                                <option value="" selected disabled>
+                                                    SELECT SECTION
+                                                </option>
+                                                @for(section of sectionList[i]; track $index){
+                                                <option value="{{ section }}">{{ section }}</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>YARD / STATION FROM</label>
+                                            <select class="form-select" formControlName="stationFrom">
+                                                <option value="" selected disabled>
+                                                    SELECT STATION
+                                                </option>
+                                                @for(station of railDetails[i].stations; track $index){
+                                                <option value="{{ station }}">{{ station }}</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>YARD / STATION TO</label>
+                                            <select class="form-select" formControlName="stationTo">
+                                                <option value="" selected disabled>
+                                                    SELECT STATION
+                                                </option>
+                                                @for(station of railDetails[i].stations; track $index){
+                                                <option value="{{ station }}">{{ station }}</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label class="required">DIRECTION</label>
+                                            <select class="form-select" formControlName="direction" required>
+                                                <option value="" selected disabled>
+                                                    SELECT DIRECTION
+                                                </option>
+                                                @for(direction of railDetails[i].directions; track $index){
+                                                <option value="{{ direction }}">{{ direction }}</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label class="d-flex justify-content-between" class="required">AVAILABLE SLOT
+                                                <div class="me-5"
+                                                    *ngIf="domain==='machineNonRolls' || domain ==='maintenanceNonRolls'">
+                                                    <input type="checkbox" value="Avl_slot_other"
+                                                        formControlName="avlSlotOtherCheckBox"
+                                                        name="avlSlotOtherCheckBox" required>
+                                                    OTHERS
+                                                </div>
+                                            </label>
+                                            <div class="dropdown"
+                                                *ngIf="!machineFormArray.controls[i].get('avlSlotOtherCheckBox').value">
+                                                <ng-multiselect-dropdown [placeholder]="'SELECT AVAILABLE SLOT'"
+                                                    [settings]="AvlSlotSettings"
+                                                    [data]="availableSlots[ machineFormArray.controls[i].get('section').value+'_'+ machineFormArray.controls[i].get('direction').value]"
+                                                    formControlName="availableSlot" >   
+                                                </ng-multiselect-dropdown>
+                                                <div *ngIf="!isSlotSelected" class="text-danger">Please select an available slot.</div>
+                                            </div>
+                                            <!-- <select class="form-select" formControlName="availableSlot" required>
+                                                <option value="" selected disabled>
+                                                    SELECT AVAILABLE SLOT
+                                                </option>
+                                                <option value="Avl_slot_other"
+                                                    *ngIf="domain==='machineNonRolls' || domain ==='maintenancesNonRolls'">
+                                                    Others
+                                                </option>
+
+                                                @for(date of availableSlots[
+                                                machineFormArray.controls[i].get("section").value+'_'+
+                                                machineFormArray.controls[i].get("direction").value];
+                                                track $index){
+                                                <option value="{{ date }}">{{ date }}</option>
+                                                }
+                                            </select> -->
+
+                                            @if(machineFormArray.controls[i].get("avlSlotOtherCheckBox").value){
+                                            <div class="row justify-content-around">
+                                                @for(ele of machineFormArray.controls[i].get("avlSlotOther").value;
+                                                track $index){
+
+                                                <div class="col-6 mt-2 slot-data d-flex justify-content-between ">
+                                                    <div class="d-flex justify-content-center align-items-center">
+                                                        {{ele}}
+                                                    </div>
+                                                    <button type="button" class="btn btn-outline-light"
+                                                        (click)="deleteSlot(i,$index)">X</button>
+                                                </div>
+                                                }
+                                            </div>
+                                            <!-- <input type="text" class="form-control mt-1"
+                                                placeholder="ENTER AVAILABLE SLOT" formControlName="avlSlotOther" /> -->
+                                            <button type="button" class="btn btn-primary form-control mt-1"
+                                                data-bs-toggle="modal" data-bs-target="#exampleModal"
+                                                (click)="setSlotIndex(i)">Choose</button>
+                                            <!-- <div class="slotFormat">*DD/MM/YYYY HH:MM to HH:MM DAY(Capital Letters)
+                                            </div> -->
+                                            }
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label class="required">BLOCK DEMAND MINUTES</label>
+                                            <input type="number" class="form-control"
+                                                placeholder="ENTER BLOCK DEMAND MINUTES" formControlName="dmd_duration"
+                                                required />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>KILOMETER</label>
+                                            <input type="text" class="form-control" placeholder="ENTER KM"
+                                                formControlName="km" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>LINE NO.</label>
+                                            <input type="text" class="form-control" placeholder="ENTER LINE NUMBER"
+                                                formControlName="lineNo" />
+                                        </div>
+                                    </div>
+                                    
+                                   
+                                    <!-- <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>YARD</label>
+                                            <input type="text" class="form-control" placeholder="ENTER YARD"
+                                                formControlName="yard" />
+                                        </div>
+                                    </div> -->
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>MACHINE TYPE</label>
+                                            <!-- <select class="form-select" formControlName="machine">
+                                                <option value="" selected disabled>
+                                                    SELECT MACHINE
+                                                </option>
+                                                @for(type of machineType; track $index){
+                                                <option value="{{ type.machine}}">{{ type.machine }}</option>
+                                                }
+                                            </select> -->
+                                            <div class="dropdown">
+                                                <ng-multiselect-dropdown [placeholder]="'SELECT MACHINE'"
+                                                    [settings]="dropdownSettings" [data]="machineType"
+                                                    formControlName="machine">
+                                                </ng-multiselect-dropdown>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>SERIES</label>
+                                            <input type="text" class="form-control" placeholder="ENTER SERIES"
+                                                formControlName="series" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>TYPE OF WORK</label>
+                                            <input type="text" class="form-control" placeholder="ENTER TYPE OF WORK"
+                                                formControlName="typeOfWork" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>QUANTUM</label>
+                                            <input type="text" class="form-control" placeholder="ENTER QUANTUM"
+                                                formControlName="quantum" />
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>DEPUTED SUPERVISOR</label>
+                                            <input type="text" class="form-control"
+                                                placeholder="ENTER DEPUTED SUPERVISOR"
+                                                formControlName="deputedSupervisor" />
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>RESOURCES</label>
+                                            <input type="text" class="form-control" placeholder="ENTER RESOURCES"
+                                                formControlName="resources" />
+                                        </div>
+                                    </div>
+                                    <!-- <div class="col-sm-6 col-md-3">
+                      <div class="form-group mt-3 mb-3">
+                        <label>APPROVAL</label>
+                        <select class="form-select" formControlName="approval">
+                          <option value="" disabled selected>
+                            SELECT APPROVAL
+                          </option>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                        </select>
+                      </div>
+                    </div> -->
+                                   
+                                    <!-- @if(department.value ==="ELECTRIC"){
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>TOWER WAGON/MATERIAL TRAIN</label>
+                                            <input type="text" class="form-control"
+                                                placeholder="ENTER TOWER WAGON/MATERIAL TRAIN"
+                                                formControlName="tower" />
+                                        </div>
+                                    </div>
+                                    } -->
+                                    <!-- @if(department.value ==="ENGINEERING"||department.value
+                                    ==="S&T"){ -->
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>TPC STAFF </label>
+                                            <select class="form-select" formControlName="tpcStaff">
+                                                <option value="" disabled selected>
+                                                    SELECT TPC STAFF
+                                                </option>
+                                                <option value="Yes">Yes</option>
+                                                <option value="No">No</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <!-- } @if(department.value ==="ENGINEERING"||department.value
+                                    ==="ELECTRIC"){ -->
+                                   
+
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>S&T STAFF</label>
+                                            <select class="form-select" formControlName="s_tStaff" >
+                                                <option value="" selected disabled>
+                                                    SELECT S&T STAFF
+                                                </option>
+                                                <option value="Yes">Yes</option>
+                                                <option value="No">No</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+
+                                            @if(domain==='machineRolls'|| domain==='maintenanceRolls'){
+
+                                            <label>WHETHER NI WORK/PNI WORK OR NON-NI WORK</label>
+                                            <select class="form-select" formControlName="ni">
+                                                <option value="NON NI" selected>
+                                                    NON NI
+                                                </option>
+                                                <option value="PNI">PNI</option>
+                                                <option value="NI">NI</option>
+                                            </select>
+
+                                            }@else{
+
+                                            <label>WHETHER EMERGENT OR OUT OF RBP WORK</label>
+                                            <select class="form-select" formControlName="ni">
+                                                <option value="EMERGENT" selected>
+                                                    EMERGENT
+                                                </option>
+                                                <option value="OUT OF RBP">OUT OF RBP</option>
+                                            </select>
+
+                                            }
+                                        </div>
+                                    </div>
+                                    <!-- } -->
+                                    <!-- @if(department.value ==="S&T"){
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label>POINT/BPAC/OTHERS</label>
+                                            <input type="text" class="form-control"
+                                                placeholder="ENTER POINT/BPAC/OTHERS" formControlName="point" />
+                                        </div>
+                                    </div>
+                                    } -->
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label class="required">REPERCUSSION/REMARKS</label>
+                                            <input type="text" class="form-control"
+                                                placeholder="ENTER REPERCUSSION/REMARKS" formControlName="remarks" required>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6 col-md-4">
+                                            <div class="form-group mt-3 mb-3">
+                                                <input type="checkbox" formControlName="integratedCheckbox" />
+                                                <label>INTEGRATED BLOCK</label>
+                                                @if(machineFormArray.controls[i].get('integratedCheckbox').value){
+                                                <div class="row text-center">
+                                                    <div class="col-4">BLOCK</div>
+                                                    <div class="col-3">SECTION</div>
+                                                    <div class="col-3">DURATION</div>
+                                                    <div class="col-2">
+                                                        <button type="button" class="btn btn-outline-primary"
+                                                            (click)="addIntegrated(i)">+</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row text-center"
+                                                    *ngFor="let integrated of integrates[i]; let $index = index"
+                                                    [attr.data-index]="i">
+                                                    <div class="col-4 p-0 pe-1">
+                                                        <input type="text" class="form-control"
+                                                            placeholder="ENTER BLOCK OF INTEGRATED" name="block"
+                                                            (change)="integratedBlock($event,i,$index)" required />
+                                                    </div>
+                                                    <div class="col-3 p-0 pe-1">
+                                                        <input type="text" class="form-control"
+                                                            placeholder="ENTER SECTION OF INTEGRATED" name="section1"
+                                                            (change)="integratedSection($event,i,$index)" required />
+                                                    </div>
+                                                    <div class="col-3 p-0 pe-1">
+                                                        <input type="number" class="form-control"
+                                                            placeholder="ENTER DURATION OF INTEGRATED" name="duration"
+                                                            (change)="integratedDuration($event,i,$index)" required />
+                                                    </div>
+                                                    <div class="col-2 p-0">
+                                                        <button type="button" class="btn btn-outline-danger"
+                                                            (click)="deleteIntegrated(i,$index)">x</button>
+                                                    </div>
+                                                </div>
+                                                }
+                                                <!-- @if(machineFormArray.controls[i].get('integratedCheckbox').value){
+                                                <select class="form-select" formControlName="integrated"
+                                                    placement="end">
+                                                    <option value="" selected disabled>
+                                                        SELECT
+                                                    </option>
+                                                    <option value="CONSTRUCTION">CONSTRUCTION</option>
+                                                    <option value="ENGINEERING">ENGINEERING</option>
+                                                    <option value="S&T">S&T</option>
+                                                    <option value="ELECTRIC">ELECTRIC</option>
+                                                    <option value="RE">RE</option>
+                                                    <option value="RVNL">RVNL</option>
+                                                    <option value="SIGNAL">SIGNAL</option>
+                                                    <option value="Telecom">Telecom</option>
+                                                    <option value="TRD">TRD</option>
+                                                </select>
+                                                } -->
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-md-2">
+                                            <div class="form-group mt-3 mb-3">
+                                                <input type="checkbox" formControlName="locoCheckbox" />
+                                                <label>LOCO REQUIRED</label>
+                                                @if(machineFormArray.controls[i].get('locoCheckbox').value){
+                                                <input type="number" class="form-control" name="loco"
+                                                    placeholder="ENTER NUMBER OF LOCO REQUIRED"
+                                                    formControlName="loco" />
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-md-2">
+                                            <div class="form-group mt-3 mb-3">
+                                                <input type="checkbox" formControlName="crewCheckbox" />
+                                                <label>CREW REQUIRED</label>
+                                                @if(machineFormArray.controls[i].get('crewCheckbox').value){
+                                                <input type="number" class="form-control"
+                                                    placeholder="ENTER NUMBER OF CREW REQUIRED"
+                                                    formControlName="crew" />
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6 col-md-4">
+                                            <div class="form-group mt-3 mb-3">
+                                                <input type="checkbox" formControlName="cautionCheckbox" />
+                                                <label>CAUTION REQUIRED</label>
+                                                @if(machineFormArray.controls[i].get('cautionCheckbox').value){
+                                                <div class="row text-center">
+                                                    <div class="col-3">Length</div>
+                                                    <div class="col-4">TDC</div>
+                                                    <div class="col-3">Speed</div>
+                                                    <div class="col-2">
+                                                        <button type="button" class="btn btn-outline-primary"
+                                                            (click)="addCaution(i)">+</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row text-center"
+                                                    *ngFor="let caution of cautions[i]; let $index = index"
+                                                    [attr.data-index]="i">
+                                                    <div class="col-3 p-0 pe-1">
+                                                        <input type="text" class="form-control"
+                                                            placeholder="ENTER LENGTH OF CAUTION" name="length"
+                                                            (change)="cautionLength($event,i,$index)" required />
+                                                    </div>
+                                                    <div class="col-4 p-0 pe-1">
+                                                        <input type="date" class="form-control"
+                                                            placeholder="ENTER TDC OF CAUTION" name="tdc"
+                                                            (change)="cautionTDC($event,i,$index)" required />
+                                                    </div>
+                                                    <!-- <div class="col-4 p-0 pe-1">
+                                                        <select>
+                                                            @for(ele of dists; track $index ){
+                                                            <option>{{ele.dist}}</option>
+                                                            }
+                                                        </select>
+                                                    </div> -->
+                                                    <div class="col-3 p-0 pe-1">
+                                                        <input type="number" class="form-control"
+                                                            placeholder="ENTER SPEED OF CAUTION" name="speed"
+                                                            (change)="cautionSpeed($event,i,$index)" required />
+                                                    </div>
+                                                    <div class="col-2">
+                                                        <button type="button" class="btn btn-outline-danger"
+                                                            (click)="deleteCaution(i,$index)">x</button>
+                                                    </div>
+                                                </div>
+                                                }
+
+                                            </div>
+                                        </div>
+                                        <!-- <div class="col-sm-6 col-md-3">
+                                            <div class="form-group mt-3 mb-3">
+                                                <input type="checkbox" formControlName="cancelTrainCheckbox" />
+                                                <label> Train Cancellation/Diversion</label>
+                                                @if(machineFormArray.controls[i].get('cancelTrainCheckbox').value){
+                                                <input type="text" class="form-control" placeholder="ENTER Add Remarks"
+                                                    formControlName="cancelTrain" required />
+                                                }
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+    </form>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">AVAILABLE SLOT</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row justify-content-around">
+                    @for(ele of machineFormArray.value[slotIndex]?.avlSlotOther; track $index){
+                    <div class="col-6 mt-2 slot-data d-flex justify-content-between">
+                        <div class="d-flex justify-content-center align-items-center">{{ele}}
+                        </div>
+                        <button type="button" class="btn btn-outline-light"
+                            (click)="deleteSlot(slotIndex,$index)">X</button>
+                    </div>
+                    }
+                    <!-- <div class="col-6 slot-data  d-flex justify-content-between">
+                        <div class="d-flex justify-content-center align-items-center">12/11/2001 00:00 to 03:00 hrs
+                        </div>
+                        <button class="btn btn-outline-danger">X</button>
+                    </div> -->
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-4">
+                        <label>Date:</label>
+                        <div class="">
+                            <input type="date" class="form-control" [(ngModel)]="slot.date">
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <label>Start:</label>
+                        <ngb-timepicker [(ngModel)]="slot.startTime" />
+                    </div>
+                    <div class="col-4">
+                        <label>end:</label>
+                        <ngb-timepicker [(ngModel)]="slot.endTime" />
+                    </div>
+                </div>
+                <hr>
+                <div class="">
+                    <button type="button" class="btn btn-primary form-control" (click)="addSlot()">ADD</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary" (click)="onSubmitSlot()" data-bs-dismiss="modal">Save
+                    changes</button> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <button type="button" mdbBtn color="primary" class="relative waves-light" (click)="basicModal.show()" mdbWavesEffect>Launch demo modal</button>
+<div mdbModal #basicModal="mdbModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myBasicModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close pull-right" aria-label="Close" (click)="basicModal.hide()">
+          <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title w-100" id="myModalLabel">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" mdbBtn color="secondary" class="waves-light" aria-label="Close" (click)="basicModal.hide()" mdbWavesEffect>Close</button>
+        <button type="button" mdbBtn color="primary" class="relative waves-light" mdbWavesEffect>Save changes</button>
+      </div>
+    </div>
+  </div>
+</div> -->

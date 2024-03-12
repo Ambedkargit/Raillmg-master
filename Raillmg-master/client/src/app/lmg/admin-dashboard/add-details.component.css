@@ -1,0 +1,18 @@
+.station {
+  border: 2px solid;
+  margin: 10px 0px;
+  padding: 10px 2px;
+}
+.AddDetails {
+  border-right: 2px solid;
+  height: 80vh;
+  margin-top: 30px;
+}
+
+.avlslot {
+  border-right: 2px solid;
+}
+
+li {
+  margin-top: 10px;
+}

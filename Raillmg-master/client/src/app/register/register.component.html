@@ -1,0 +1,117 @@
+<section class="vh-100" style="background-color: rgb(244, 244, 244)">
+  <div class="container h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card shadow-2-strong" style="border-radius: 1rem">
+          <h1 class="text-center pt-5">LUMDING DIVISION</h1>
+          <div class="card-body p-5">
+            <h3 class="mb-5 text-center">Register</h3>
+            <form [formGroup]="registerForm">
+              <div class="form-group mt-3 mb-3">
+                <label for="usename">User Name</label>
+                <input type="text" class="form-control" id="username" placeholder="Enter User Name"
+                  formControlName="username" />
+              </div>
+
+              <div class="form-group mt-3 mb-3">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Password"
+                  formControlName="password" />
+              </div>
+              <!-- <div class="form-group mt-3 mb-3">
+                <label for="usename">Email</label>
+                <input type="email" class="form-control" id="username" placeholder="Enter Email"
+                  formControlName="email" />
+              </div> -->
+              <div class="form-group mt-3 mb-3">
+                <label for="designation">Designation</label>
+                <input type="text" class="form-control" id="designation" placeholder="Enter DESIGNATION"
+                  formControlName="designation" />
+                <!-- <select
+                  class="form-select"
+                  aria-label="Default select example"
+                  formControlName="designation"
+                >
+                  <option value="null" disabled selected>
+                    Select Designation
+                  </option>
+                  <option value="DRM">DRM</option>
+                  <option value="ADRM">ADRM</option>
+                  <option value="DOM/IC">DOM/IC</option>
+                  <option value="AOM/GOODS">AOM/GOODS</option>
+                  <option value="AOM/COACHING">AOM/COACHING</option>
+                  <option value="Sr.DCM">Sr.DCM</option>
+                  <option value="DCM">DCM</option>
+                  <option value="ACM">ACM</option>
+                  <option value="ARM/NCB">ARM/NCB</option>
+                  <option value="TI/MOV">TI/MOV</option>
+                  <option value="TI/HQ">TI/HQ</option>
+                  <option value="TI/SWR">TI/SWR</option>
+                  <option value="TI/STORE">TI/STORE</option>
+                  <option value="TI/PLANNING">TI/PLANNING</option>
+                  <option value="TI/IT">TI/IT</option>
+                  <option value="TI/APDJ-1">TI/APDJ-1</option>
+                  <option value="TI/APDJ-2">TI/APDJ-2</option>
+                  <option value="TI/CL/APDJ">TI/CL/APDJ</option>
+                  <option value="TI/CL/NCB">TI/CL/NCB</option>
+                  <option value="TI/CL/APDJ@NJP">
+                    {{ "TI/CL/APDJ@NJP" }}
+                  </option>
+                  <option value="TI/NMZ">TI/NMZ</option>
+                  <option value="TI/NCB">TI/NCB</option>
+                  <option value="TI/JPE">TI/JPE</option>
+                  <option value="TI/NMX">TI/NMX</option>
+                  <option value="TI/FKM">TI/FKM</option>
+                </select> -->
+              </div>
+
+              <div class="form-group mt-3 mb-3">
+                <label>Department</label>
+                <select class="form-select" formControlName="department">
+                  <option value="null" disabled selected>
+                    Select Department
+                  </option>
+                  <option value="OPERATING">OPERATING</option>
+                  <option value="CONSTRUCTION">CONSTRUCTION</option>
+                  <option value="ENGINEERING">ENGINEERING</option>
+                  <option value="SIGNAL">SIGNAL</option>
+                  <option value="TRD">TRD</option>
+                  <option value="IRCON-PKG2 (BPB)">IRCON-PKG2 (BPB)</option>
+                  <option value="IRCON-PKG6 (LMG-FKG)">IRCON-PKG6 (LMG-FKG)</option>
+                  <option value="RITES-(LMG-BPB)">RITES-(LMG-BPB)</option>
+                  <option value="RECON-(HJI-LMG & CPK-HJI)">RECON-(HJI-LMG & CPK-HJI)</option>
+                  <!-- <option value="RE">RE</option>
+                  <option value="RVNL">RVNL</option>
+                  <option value="SIGNAL">SIGNAL</option>
+                  <option value="Telecom">Telecom</option>
+                  <option value="TRD">TRD</option> -->
+                </select>
+              </div>
+
+              <!-- <div class="form-group mt-3 mb-3">
+                <label>Mobile Number</label>
+                <input
+                  type="number"
+                  id="form2Example22"
+                  class="form-control"
+                  placeholder="Mobile Number"
+                  formControlName="mobile"
+                />
+              </div> -->
+
+              <button type="submit" class="btn btn-primary w-100 btn-lg mt-2" (click)="onRegister()">
+                Register
+              </button>
+            </form>
+            <div class="text-center mt-2 user-footer">
+              <span>Already have an account?</span>
+              <button type="button" class="btn btn-link" routerLink="/login">
+                Login
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
