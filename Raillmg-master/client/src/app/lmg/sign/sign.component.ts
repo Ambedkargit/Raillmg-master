@@ -112,6 +112,5 @@ export class SignComponent implements OnInit {
       return null;
     }
   }
-  
-  
+    
 }
