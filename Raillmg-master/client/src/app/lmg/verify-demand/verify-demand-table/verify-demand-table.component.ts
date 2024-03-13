@@ -290,6 +290,8 @@ export class VerifyDemandTableComponent implements OnInit {
           
           data = data.filter(item => item.date === currentDate || item.date === previousDate);
 
+          data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+          
           this.setDataToRoll(data, url);
         });
       }

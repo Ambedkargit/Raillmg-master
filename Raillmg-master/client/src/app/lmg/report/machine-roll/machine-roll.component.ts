@@ -92,8 +92,12 @@ export class MachineRollComponent implements OnInit {
               return item;
             });
         
-            // Update dataset and Handsontable
             this.dataset.push(...data);
+          // Sort dataset based on date in ascending order
+          this.dataset.sort((a, b) => {
+            return new Date(a.date).getTime() - new Date(b.date).getTime();
+          });
+          
             hot.updateData(this.dataset);
           });
         });
