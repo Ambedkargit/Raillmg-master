@@ -123,36 +123,6 @@ export class MachineRollComponent implements OnInit {
   }
 
   onPdfDownload() {
-    // const hot = this.hotRegisterer.getInstance(this.id);
-    // const exportPlugin = hot.getPlugin('exportFile');
-    // const exportedString = exportPlugin.exportAsString('csv', {
-    //   bom: false,
-    //   columnHeaders: true,
-    //   exportHiddenColumns: true,
-    //   exportHiddenRows: true,
-    //   rowDelimiter: '\r\n',
-    
-    // });
-    // const workbook = XLSX.utils.book_new();
-    // const jsonData = Papa.parse(exportedString);
-    // let dataSet = jsonData.data.map((ele) => {
-    //   ele.shift();
-    //   ele.pop();
-    //   return ele;
-    // });
-
-    // const doc = new jsPDF('p', 'pc', [300, 500]);
-    // // autoTable(doc, { html: '#table-wrapper' });
-    // autoTable(doc, {
-    //   head: [dataSet.shift()],
-    //   body: dataSet,
-    // });
-    // // doc.save('raillmg.pdf');
-    
-    //   const pdfData = doc.output('blob');//send pdf file to other component
-    //   this.connect.sendPdf(pdfData);
-    //   console.log(doc);
-
     const hot = this.hotRegisterer.getInstance(this.id);
     const exportPlugin = hot.getPlugin('exportFile');
     const exportedString = exportPlugin.exportAsString('csv', {
@@ -161,47 +131,59 @@ export class MachineRollComponent implements OnInit {
       exportHiddenColumns: true,
       exportHiddenRows: true,
       rowDelimiter: '\r\n',
+    
     });
     const workbook = XLSX.utils.book_new();
     const jsonData = Papa.parse(exportedString);
-    console.log('🚀 ~ jsonData:', jsonData.data[1]);
     let dataSet = jsonData.data.map((ele) => {
-         ele.shift();
-        ele.pop();
-         return ele;
-       });
+      ele.shift();
+      ele.pop();
+      return ele;
+    });
 
     const doc = new jsPDF('p', 'pc', [300, 500]);
     // autoTable(doc, { html: '#table-wrapper' });
     autoTable(doc, {
-      head: [jsonData.data.shift()],
-      body: jsonData.data,
+      head: [dataSet.shift()],
+      body: dataSet,
     });
-    const pdfString = doc.output('datauristring');
-    this.connect.setPdfData(pdfString);
-  }
+     doc.save('raillmg.pdf');
   
-  //   // Convert the PDF content to a data URI
-  //   const pdfDataUri = doc.output('datauristring');
+    //   const pdfData = doc.output('blob');//send pdf file to other component
+    //   this.connect.sendPdf(pdfData);
+    //   console.log(doc);
+  }
 
-  //   // Redirect to another page with the PDF data URI as a parameter
-  //   window.location.href = 'otherpage.html?pdf=' + encodeURIComponent(pdfDataUri);
- 
-    // autoTable(doc, {
-    //   //startY: doc.lastAutoTable.finalY + 10, // Adjust as needed for spacing
-    //   foot: [['Signature', 'Signature', 'Signature', 'Signature']], // Header of the signature column
-    //   body: [['', '', '', '']], // You can adjust the number of cells based on your table structure
-    //   //theme: 'grid', // You can change the theme as needed
-    //   columnStyles: { 
-    //     0: { cellWidth: 60, fontStyle: 'italic' }, // Adjust cell width and font style for the first column
-    //     1: { cellWidth: 60 }, // Adjust cell width for the second column
-    //     2: { cellWidth: 60 }, // Adjust cell width for the third column
-    //     3: { cellWidth: 60 } // Adjust cell width for the fourth column
-    //   },
-    //   margin: { top: 50, right: 10, bottom: 10, left: 10 },
-       
-    // });
+  //getting pdf on sign component
 
+  //   const hot = this.hotRegisterer.getInstance(this.id);
+  //   const exportPlugin = hot.getPlugin('exportFile');
+  //   const exportedString = exportPlugin.exportAsString('csv', {
+  //     bom: false,
+  //     columnHeaders: true,
+  //     exportHiddenColumns: true,
+  //     exportHiddenRows: true,
+  //     rowDelimiter: '\r\n',
+  //   });
+  //   const workbook = XLSX.utils.book_new();
+  //   const jsonData = Papa.parse(exportedString);
+  //   console.log('🚀 ~ jsonData:', jsonData.data[1]);
+  //   let dataSet = jsonData.data.map((ele) => {
+  //        ele.shift();
+  //       ele.pop();
+  //        return ele;
+  //      });
+
+  //   const doc = new jsPDF('p', 'pc', [300, 500]);
+  //   // autoTable(doc, { html: '#table-wrapper' });
+  //   autoTable(doc, {
+  //     head: [jsonData.data.shift()],
+  //     body: jsonData.data,
+  //   });
+  //   const pdfString = doc.output('datauristring');
+  //   this.connect.setPdfData(pdfString);
+  // }
+  
     
 
   selectStartDate(e) {

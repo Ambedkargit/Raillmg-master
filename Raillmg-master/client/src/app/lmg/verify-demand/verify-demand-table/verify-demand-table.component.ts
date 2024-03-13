@@ -252,6 +252,8 @@ export class VerifyDemandTableComponent implements OnInit {
     } else {
       fetchUrl = ['machineNonRolls', 'maintenanceNonRolls'];
     }
+    const currentDate = DateTime.now().toFormat('dd/MM/yyyy');
+    const previousDate = DateTime.now().minus({ days: 1 }).toFormat('dd/MM/yyyy');
 
     Promise.resolve().then(() => {
       for (let url of fetchUrl) {
@@ -285,6 +287,8 @@ export class VerifyDemandTableComponent implements OnInit {
             return item;
           
           });
+          
+          data = data.filter(item => item.date === currentDate || item.date === previousDate);
 
           this.setDataToRoll(data, url);
         });

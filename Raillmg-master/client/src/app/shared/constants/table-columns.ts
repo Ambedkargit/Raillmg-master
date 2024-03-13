@@ -89,11 +89,11 @@ export const columns: Handsontable.ColumnSettings[] = [
     defaultData: true,
     width: 120,
   },
-  {
-    data: 'Dmd_remarks',
-    title: 'DEMAND REMARKS',
-    width: 140,
-  },
+  // {
+  //   data: 'Dmd_remarks',
+  //   title: 'DEMAND REMARKS',
+  //   width: 140,
+  // },
   {
     data: 'status',
     title: ' APPROVE STATUS',
@@ -101,11 +101,11 @@ export const columns: Handsontable.ColumnSettings[] = [
     selectOptions: ['Accept', 'Reject'],
     width: 130,
   },
-  {
-    data: 'APL_remarks',
-    title: 'APPROVAL REMARKS',
-    width: 130,
-  },
+  // {
+  //   data: 'APL_remarks',
+  //   title: 'APPROVAL REMARKS',
+  //   width: 130,
+  // },
   
   {
     data: 'department',
