@@ -82,25 +82,25 @@ export const columns: Handsontable.ColumnSettings[] = [
     correctFormat: true,
     width: 95,
   },
-  {
-    data: 'Avl_status',
-    title: 'AVAIL STATUS',
-    type: 'checkbox',
-    defaultData: true,
-    width: 120,
-  },
+  // {
+  //   data: 'Avl_status',
+  //   title: 'AVAIL STATUS',
+  //   type: 'checkbox',
+  //   defaultData: true,
+  //   width: 120,
+  // },
   // {
   //   data: 'Dmd_remarks',
   //   title: 'DEMAND REMARKS',
   //   width: 140,
   // },
-  {
-    data: 'status',
-    title: ' APPROVE STATUS',
-    type: 'select',
-    selectOptions: ['Accept', 'Reject'],
-    width: 130,
-  },
+  // {
+  //   data: 'status',
+  //   title: ' APPROVE STATUS',
+  //   type: 'select',
+  //   selectOptions: ['Accept', 'Reject'],
+  //   width: 130,
+  // },
   // {
   //   data: 'APL_remarks',
   //   title: 'APPROVAL REMARKS',
@@ -167,7 +167,7 @@ export const columns: Handsontable.ColumnSettings[] = [
   },
   
   { data: 'km', title: 'KILOMETER', width: 80 },
-  { data: 'ni', title: ' NI/Non-NI Work', width: 130 },
+  // { data: 'ni', title: ' NI/Non-NI Work', width: 130 },
   // { data: 'yard', title: 'Yard', width: 70 },
   { data: 'lineNo', title: 'KM/LINE', width: 90 },
   
@@ -207,13 +207,13 @@ export const columns: Handsontable.ColumnSettings[] = [
   //   editor: false,
   //   readOnly: true,
   // },
-  {
-    data: 'grant_status',
-    title: 'GRANT STATUS',
-    type: 'select',
-    selectOptions: ['Pending', 'Granted', 'Not Granted'],
-    width: 120,
-  },
+  // {
+  //   data: 'grant_status',
+  //   title: 'GRANT STATUS',
+  //   type: 'select',
+  //   selectOptions: ['Pending', 'Granted', 'Not Granted'],
+  //   width: 120,
+  // },
    
   // {
   //   data: 'caution',
@@ -244,7 +244,7 @@ export const columns: Handsontable.ColumnSettings[] = [
     width: 160,
   },
   { data: 'time_granted', title: 'TIME GRANTED', width: 120 },
-  { data: 'slot', title: 'SLOTS', width: 70 },
+  // { data: 'slot', title: 'SLOTS', width: 70 },
   { data: 'output', title: 'OUTPUT', width: 100 },
   { data: 'OPTG_remarks', title: 'OPTG REMARKS', width: 120 },
   {

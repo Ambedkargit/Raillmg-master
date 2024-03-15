@@ -252,8 +252,8 @@ export class VerifyDemandTableComponent implements OnInit {
     } else {
       fetchUrl = ['machineNonRolls', 'maintenanceNonRolls'];
     }
-    const currentDate = DateTime.now().toFormat('dd/MM/yyyy');
-    const previousDate = DateTime.now().minus({ days: 1 }).toFormat('dd/MM/yyyy');
+    const currentDate = DateTime.now().toFormat('dd/MM/yyyy'); //show current date data
+    const previousDate = DateTime.now().minus({ days: 1 }).toFormat('dd/MM/yyyy'); //show previous date data
 
     Promise.resolve().then(() => {
       for (let url of fetchUrl) {
@@ -288,7 +288,7 @@ export class VerifyDemandTableComponent implements OnInit {
           
           });
           
-          data = data.filter(item => item.date === currentDate || item.date === previousDate);
+          data = data.filter(item => item.date === currentDate || item.date === previousDate); //save current & previous date data
 
           data.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
           

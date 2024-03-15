@@ -249,12 +249,15 @@ export class AddMachineConstComponent implements OnInit {
 
         const dt = DateTime.now();
         const startTime = DateTime.fromFormat(splitSlot[1], 'HH:mm');
-        const endTime = DateTime.fromFormat(splitSlot[3], 'HH:mm');
-        const timeDifferenceInMinutes = endTime.diff(
-          startTime,
-          'minutes'
-        ).minutes;
-
+        let endTime = DateTime.fromFormat(splitSlot[3], 'HH:mm');
+        
+        // Adjust endTime if it's less than startTime
+        if (endTime < startTime) {
+          endTime = endTime.plus({days: 1}); // Adding 1 day (24 hours)
+        }
+        
+        const timeDifferenceInMinutes = endTime.diff(startTime,'minutes').minutes;
+        
         // item.machine = item.machine.map((item) => {
         //   return item.machine.trim();
         // });
@@ -265,7 +268,7 @@ export class AddMachineConstComponent implements OnInit {
           avl_end: splitSlot[3],
           date: splitSlot[0],
           department: this.department.value,
-          avl_duration: timeDifferenceInMinutes,
+          avl_duration: Math.abs(timeDifferenceInMinutes), 
           createdAt: new Date().toISOString(),
           createdBy: this.userData.username,
           updatedAt: new Date().toISOString(),
