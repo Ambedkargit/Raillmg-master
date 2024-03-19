@@ -248,7 +248,7 @@ export class AddMachineConstComponent implements OnInit {
         item.integrated = this.integrates[index];
 
         const dt = DateTime.now();
-        const startTime = DateTime.fromFormat(splitSlot[1], 'HH:mm');
+        const startTime = DateTime.fromFormat(splitSlot[2], 'HH:mm');
         let endTime = DateTime.fromFormat(splitSlot[3], 'HH:mm');
         
         // Adjust endTime if it's less than startTime
@@ -268,7 +268,7 @@ export class AddMachineConstComponent implements OnInit {
           avl_end: splitSlot[3],
           date: splitSlot[0],
           department: this.department.value,
-          avl_duration: Math.abs(timeDifferenceInMinutes), 
+          avl_duration: timeDifferenceInMinutes, 
           createdAt: new Date().toISOString(),
           createdBy: this.userData.username,
           updatedAt: new Date().toISOString(),
@@ -278,6 +278,12 @@ export class AddMachineConstComponent implements OnInit {
         });
       }
     }
+    payload.sort((a, b) => {
+      const dateA = DateTime.fromFormat(a.date, 'dd/MM/yyyy');
+      const dateB = DateTime.fromFormat(b.date, 'dd/MM/yyyy');
+      return dateA.toMillis() - dateB.toMillis();
+  });
+  
     // console.log('🚀 ~ payload:', payload);
     // return;
     this.service.addRailDetails(this.domain, payload).subscribe((res) => {
@@ -469,7 +475,7 @@ export class AddMachineConstComponent implements OnInit {
       return;
     }
     const parsedDate = DateTime.fromISO(this.slot.date);
-    const formattedDate = parsedDate.toFormat('dd/LL/yyyy');
+    const formattedDate = parsedDate.toFormat('dd/MM/yyyy');
     let text = `${formattedDate} ${this.slot.startTime.hour}:${this.slot.startTime.minute} to ${this.slot.endTime.hour}:${this.slot.endTime.minute} hrs`;
     this.machineFormArray.value[this.slotIndex].avlSlotOther.push(text);
     this.slot = {
