@@ -92,12 +92,12 @@ export class MachineRollComponent implements OnInit {
               return item;
             });
         
-            this.dataset.push(...data);
+           
           // Sort dataset based on date in ascending order
           this.dataset.sort((a, b) => {
             return new Date(a.date).getTime() - new Date(b.date).getTime();
           });
-          
+             this.dataset.push(...data);
             hot.updateData(this.dataset);
           });
         });
@@ -153,10 +153,7 @@ export class MachineRollComponent implements OnInit {
     });
      doc.save('raillmg.pdf');
   
-    //   const pdfData = doc.output('blob');//send pdf file to other component
-    //   this.connect.sendPdf(pdfData);
-    //   console.log(doc);
-  }
+   }
 
   //getting pdf on sign component
 
@@ -184,8 +181,8 @@ export class MachineRollComponent implements OnInit {
   //     head: [jsonData.data.shift()],
   //     body: jsonData.data,
   //   });
-  //   const pdfString = doc.output('datauristring');
-  //   this.connect.setPdfData(pdfString);
+  //   const pdfData = doc.output('datauristring');
+  //   this.connect.setPdfData(pdfData);
   // }
   
     

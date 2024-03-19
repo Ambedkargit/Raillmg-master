@@ -184,21 +184,21 @@ export const columns: Handsontable.ColumnSettings[] = [
   // { data: 'tower', title: 'TOWER/MAT...', width: 110 },
   // { data: 'cancelTrain', title: 'TRAIN CANCEL...', width: 130 },
 
-  {
-    data: 'burst',
-    title: 'BLOCK DETAILS',
-    type: 'select',
-    selectOptions: ['BLOCK BURST', 'Block Ended on Time', 'BLOCK EXTENDED'],
-    width: 120,
-  },
+  // {
+  //   data: 'burst',
+  //   title: 'BLOCK DETAILS',
+  //   type: 'select',
+  //   selectOptions: ['BLOCK BURST', 'Block Ended on Time', 'BLOCK EXTENDED'],
+  //   width: 120,
+  // },
 
-  {
-    data: 'integrates',
-    title: 'INTEGRATED',
-    width: 230,
-    editor: false,
-    readOnly: true,
-  },
+  // {
+  //   data: 'integrates',
+  //   title: 'INTEGRATED',
+  //   width: 230,
+  //   editor: false,
+  //   readOnly: true,
+  // },
   // {
   //   data: 'integrated',
   //   title: 'INTEGRATED',
@@ -228,22 +228,22 @@ export const columns: Handsontable.ColumnSettings[] = [
   //   title: 'CAUTION',
   //   width: 300,
   // },
-  {
-    data: 'cautionLength',
-    title: 'CAUTION LENGTH',
-    width: 160,
-  },
-  {
-      data: 'cautionTdc',
-      title: 'CAUTION TDC',
-      width: 160,
-    },
-  {
-    data: 'cautionSpeed',
-    title: 'CAUTION SPEED',
-    width: 160,
-  },
-  { data: 'time_granted', title: 'TIME GRANTED', width: 120 },
+  // {
+  //   data: 'cautionLength',
+  //   title: 'CAUTION LENGTH',
+  //   width: 160,
+  // },
+  // {
+  //     data: 'cautionTdc',
+  //     title: 'CAUTION TDC',
+  //     width: 160,
+  //   },
+  // {
+  //   data: 'cautionSpeed',
+  //   title: 'CAUTION SPEED',
+  //   width: 160,
+  // },
+  // { data: 'time_granted', title: 'TIME GRANTED', width: 120 },
   // { data: 'slot', title: 'SLOTS', width: 70 },
   { data: 'output', title: 'OUTPUT', width: 100 },
   { data: 'OPTG_remarks', title: 'OPTG REMARKS', width: 120 },

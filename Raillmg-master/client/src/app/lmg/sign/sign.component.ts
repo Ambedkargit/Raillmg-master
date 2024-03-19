@@ -42,7 +42,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ConnectService } from '../../services/connect.service';
-import { PDFDocument, rgb } from 'pdf-lib';
+import { PDFDocument, rgb, PDFName } from 'pdf-lib';
 @Component({
   selector: 'app-sign',
   standalone: true,
@@ -73,14 +73,14 @@ export class SignComponent implements OnInit {
   async signPdf() {
     try {
       if (!this.pdfData) throw new Error('PDF data is not available.');
-  
+    
       const pdfBytes = await this.fetchPdfBytes(this.pdfData);
       if (!pdfBytes) throw new Error('Failed to fetch PDF bytes.');
-  
+    
       const pdfDoc = await PDFDocument.load(pdfBytes);
       const pages = pdfDoc.getPages();
       const firstPage = pages[0];
-  
+    
       // Add signature text
       firstPage.drawText('Your Digital Signature Text', {
         x: 50,
@@ -89,15 +89,20 @@ export class SignComponent implements OnInit {
         color: rgb(1, 0, 0) // Red color
       });
   
+      // Add digital signature (example using an empty signature field)
+      const signatureAppearance = pdfDoc.getForm().getSignature('SignatureField');
+      firstPage.node.set(PDFName.of('Annots'), ...[signatureAppearance.ref]);
+  
       // Update the PDF Data after signing
       const updatedPdfBytes = await pdfDoc.save();
       const updatedPdfData = new Blob([updatedPdfBytes], { type: 'application/pdf' });
       this.signedPdfData = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(updatedPdfData));
-      
+        
     } catch (error) {
       console.error('Error signing PDF:', error);
     }
   }
+  
   
   async fetchPdfBytes(url: SafeResourceUrl): Promise<Uint8Array | null> {
     try {
