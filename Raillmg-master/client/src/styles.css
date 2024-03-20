@@ -81,3 +81,9 @@ tr:nth-child(odd) {
  .handsontable thead th:nth-child(14) {
   background-color: rgb(223, 67, 67) !important;
 }  */
+.redCell {
+  background-color: rgba(255, 106, 106, 0.752) !important;
+}
+.greenCell {
+  background-color: rgba(113, 255, 121, 0.752) !important;
+}

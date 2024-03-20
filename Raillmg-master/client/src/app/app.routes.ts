@@ -10,12 +10,13 @@ import { MaintenanceRollComponent } from './lmg/demand/maintenance-roll/maintena
 import { MaintenanceNonRollComponent } from './lmg/demand/maintenance-non-roll/maintenance-non-roll.component';
 import { MachineUploadFileComponent } from './lmg/demand/machine-upload-file/machine-upload-file.component';
 import { EditMachineRollComponent } from './lmg/edit/edit-machine-roll.component';
-import { VerifyDemandComponent } from './lmg/verify-demand/verify-demand.component';
 import { AddDetailsComponent } from './lmg/admin-dashboard/add-details.component';
 import { MachineRollComponent } from './lmg/report/machine-roll/machine-roll.component';
 import { ReportComponent } from './lmg/report/report.component';
 import { UserDetailsComponent } from './lmg/user-details/user-details.component';
 import { SignComponent } from './lmg/sign/sign.component';
+import { RollingDemandComponent } from './lmg/verify-demand/rolling-demand/rolling-demand.component';
+import { NonRollingDemandComponent } from './lmg/verify-demand/non-rolling-demand/non-rolling-demand.component';
 
 export const routes: Routes = [
   {
@@ -54,7 +55,11 @@ export const routes: Routes = [
       },
       {
         path: 'verify-demand',
-        component: VerifyDemandComponent,
+        // component: VerifyDemandComponent,
+        children: [
+        { path: 'rolling', component: RollingDemandComponent},
+        { path: 'non-Rolling', component: NonRollingDemandComponent},
+        ],
       },
       {
         path: 'report',

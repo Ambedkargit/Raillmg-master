@@ -38,10 +38,20 @@
             </li> -->
           </ul>
         </li>
-        <li>
-          <a class="nav-link active" role="button" [routerLink]="['verify-demand']">
-            Verify Demand
+        <li class="nav-item dropdown">
+          
+          <a class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false" >Verify Demand
           </a>
+          <ul class="dropdown-menu">
+          <li>
+          <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+          [routerLink]="['verify-demand', 'rolling']">Rolling Demand</a>
+          </li>
+          <li>
+            <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+            [routerLink]="['verify-demand', 'non-Rolling']">Non-Rolling Demand</a>
+            </li>
+            </ul>
         </li>
         <!-- <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">

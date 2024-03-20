@@ -3,3 +3,8 @@
   overflow-y: scroll;
   scroll-behavior: smooth;
 }
+
+  .table-header th {
+    background-color: blue;
+    color : #fff;
+  }

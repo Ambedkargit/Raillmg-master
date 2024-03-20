@@ -9,6 +9,10 @@ import { IUser } from '../../../shared/model/user.model';
 import { localStorageService } from '../../../shared/service/local-storage.service';
 import { ToastService } from '../../../shared/toast/toast.service';
 import { CommonModule } from '@angular/common';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as Papa from 'papaparse';
+import * as XLSX from 'xlsx';
 // import { CautionRender } from '../../../shared/constants/table-columns';
 
 @Component({
@@ -62,27 +66,53 @@ export class VerifyDemandTableComponent implements OnInit {
       data: 'board',
       title: 'BOARD',
       type: 'select',
-      selectOptions: ['BG1', 'BG2', 'BG3', 'BG4', 'BG5'],
+      // selectOptions: ['BG1', 'BG2', 'BG3', 'BG4', 'BG5'],
       width: 73,
     },
     { data: 'section', title: 'SECTION', width: 80 },
+    {
+      data: 'direction',
+      title: 'DIRECTION',
+      type: 'text',
+      // selectOptions: ['UP', 'DN', 'BOTH'],
+      width: 90,
+    },
+    {
+      data: 'stationFrom',
+      title: 'STATION FROM',
+      type: 'text',
+      // selectOptions: stationList,
+      width: 120,
+    },
+    {
+      data: 'stationTo',
+      title: 'STATION TO',
+      type: 'text',
+      // selectOptions: stationList,
+      width: 100,
+    },
+    { data: 'km', title: 'KILOMETER', width: 80 },
+    { data: 'lineNo', title: 'LINE', width: 60 },
     { data: 'typeOfWork', title: 'TYPE OF WORK', width: 120 },
     { data: 'machine', title: 'MACHINE TYPE', width: 120 },
     { data: 'quantum', title: 'QUANTUM', width: 120 },
-    
+    { data: 'series', title: 'SERIES', width: 80 },
     { data: 'avl_start', title: 'SLOT START', width: 100 },
     { data: 'avl_end', title: 'SLOT END', width: 90 },
     { data: 'avl_duration', title: 'AVL DUR...', width: 100 },
     { data: 'dmd_duration', title: 'DMD DUR...', width: 100 },
+    { data: 'loco', title: 'LOCO', width: 70 },
+    { data: 'crew', title: 'CREW', width: 70 },
+    { data: 's_tStaff', title: 'S&T STAFF', width: 90 },
+    { data: 'tpcStaff', title: 'TPC STAFF', width: 90 },
     { data: 'remarks', title: ' REMARKS', width: 90 },
-  
-   {
-     data: 'burst',
-     title: 'BLOCK DETAILS',
-     type: 'select',
-     selectOptions: ['BLOCK BURST', 'Block Ended on Time', 'BLOCK EXTENDED'],
-     width: 120,
-   },
+  //  {
+  //    data: 'burst',
+  //    title: 'BLOCK DETAILS',
+  //    type: 'select',
+  //    selectOptions: ['BLOCK BURST', 'Block Ended on Time', 'BLOCK EXTENDED'],
+  //    width: 120,
+  //  },
    
    {
     data: 'integrates',
@@ -109,17 +139,17 @@ export class VerifyDemandTableComponent implements OnInit {
     {
       data: 'cautionLength',
       title: 'CAUTION LENGTH',
-      width: 160,
+      width: 150,
     },
     {
         data: 'cautionTdc',
         title: 'CAUTION TDC',
-        width: 160,
+        width: 120,
       },
     {
       data: 'cautionSpeed',
       title: 'CAUTION SPEED',
-      width: 160,
+      width: 120,
     },
     {
       data: 'grant_status',
@@ -166,7 +196,7 @@ export class VerifyDemandTableComponent implements OnInit {
 
   hotSettings: Handsontable.GridSettings = {
     ...hotSettings,
-    height: '32vh',
+    height: '100vh',
     columns: this.columns,
     afterChange: (changes) => {
       changes?.forEach(([row, prop, oldValue, newValue]) => {
@@ -176,7 +206,8 @@ export class VerifyDemandTableComponent implements OnInit {
         }
         const hot = this.hotRegisterer.getInstance(this.id);
         let id = hot.getDataAtRow(row)[0];
-        const url = hot.getDataAtRow(row)[22];
+        const url = hot.getDataAtRow(row)[36];
+        console.log(hot.getDataAtRow(row));
         if (oldValue == newValue || (newValue == '' && oldValue == undefined)) {
           return;
         }
@@ -189,6 +220,7 @@ export class VerifyDemandTableComponent implements OnInit {
           oldValue,
           newValue,
         };
+        
         let payload: Partial<IMachineRoll> = {
           [headerKey]: newValue,
           updatedBy: this.userData['username'],
@@ -205,10 +237,18 @@ export class VerifyDemandTableComponent implements OnInit {
       });
     },
     cells: (row, col, prop) => {
-      let cp = { className: row % 2 == 0 ? 'evenCell' : 'oddCell' };
+      // let cp = { className: row % 2 == 0 ? 'evenCell' : 'oddCell' };
       if (this.dataSet.length === 0) {
         return;
       }
+      let cp = {
+        className:
+          this.dataSet[row].status == 'Reject'
+            ? 'redCell'
+            : this.dataSet[row].status == 'Accept'
+            ? 'greenCell'
+            : '',
+      };
 
       if (
         (prop === 'grant_status' ||
@@ -297,6 +337,56 @@ export class VerifyDemandTableComponent implements OnInit {
       }
     });
   }
+
+  onExcelDownload() {
+    const hot = this.hotRegisterer.getInstance(this.id);
+    const exportPlugin = hot.getPlugin('exportFile');
+    const exportedString = exportPlugin.exportAsString('csv', {
+      bom: false,
+      columnHeaders: true,
+      exportHiddenColumns: true,
+      exportHiddenRows: true,
+      rowDelimiter: '\r\n',
+    });
+
+    const jsonData = Papa.parse(exportedString);
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet([]);
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Dates');
+    XLSX.utils.sheet_add_aoa(worksheet, jsonData.data);
+    XLSX.writeFile(workbook, 'MachineRolls.xlsx');
+    this.toastService.showSuccess('Downloaded Excel file');
+  }
+
+  onPdfDownload() {
+    const hot = this.hotRegisterer.getInstance(this.id);
+    const exportPlugin = hot.getPlugin('exportFile');
+    const exportedString = exportPlugin.exportAsString('csv', {
+      bom: false,
+      columnHeaders: true,
+      exportHiddenColumns: true,
+      exportHiddenRows: true,
+      rowDelimiter: '\r\n',
+    
+    });
+    const workbook = XLSX.utils.book_new();
+    const jsonData = Papa.parse(exportedString);
+    let dataSet = jsonData.data.map((ele) => {
+      ele.shift();
+      ele.pop();
+      return ele;
+    });
+
+    const doc = new jsPDF('p', 'pc', [300, 500]);
+    // autoTable(doc, { html: '#table-wrapper' });
+    autoTable(doc, {
+      head: [dataSet.shift()],
+      body: dataSet,
+    });
+     doc.save('raillmg.pdf');
+  
+   }
+
 
   setDataToRoll(data, rollfrom) {
     const hot1 = this.hotRegisterer.getInstance(this.id);

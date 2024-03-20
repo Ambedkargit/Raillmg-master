@@ -82,30 +82,24 @@ export const columns: Handsontable.ColumnSettings[] = [
     correctFormat: true,
     width: 95,
   },
-  // {
-  //   data: 'Avl_status',
-  //   title: 'AVAIL STATUS',
-  //   type: 'checkbox',
-  //   defaultData: true,
-  //   width: 120,
-  // },
-  // {
-  //   data: 'Dmd_remarks',
-  //   title: 'DEMAND REMARKS',
-  //   width: 140,
-  // },
-  // {
-  //   data: 'status',
-  //   title: ' APPROVE STATUS',
-  //   type: 'select',
-  //   selectOptions: ['Accept', 'Reject'],
-  //   width: 130,
-  // },
-  // {
-  //   data: 'APL_remarks',
-  //   title: 'APPROVAL REMARKS',
-  //   width: 130,
-  // },
+  
+  {
+    data: 'Dmd_remarks',
+    title: 'DEMAND REMARKS',
+    width: 140,
+  },
+  {
+    data: 'status',
+    title: ' APPROVE STATUS',
+    type: 'select',
+    selectOptions: ['Accept', 'Reject'],
+    width: 130,
+  },
+  {
+    data: 'APL_remarks',
+    title: 'APPROVAL REMARKS',
+    width: 130,
+  },
   
   {
     data: 'department',
@@ -128,20 +122,13 @@ export const columns: Handsontable.ColumnSettings[] = [
     // selectOptions: sectionList,
     width: 80,
   },
-  { data: 'typeOfWork', title: 'WORK TYPE', width: 110 },
   {
-    data: 'machine',
-    title: 'MACHINE TYPE',
-    //type: 'text',
-    //selectOptions: machineType,
-    width: 150,
+    data: 'direction',
+    title: 'DIRECTION',
+    type: 'text',
+    // selectOptions: ['UP', 'DN', 'BOTH'],
+    width: 90,
   },
-  { data: 'series', title: 'SERIES', width: 80 },
-  { data: 'quantum', title: 'QUANTUM', width: 100 },
-  { data: 'avl_start', title: ' SLOT START', width: 100 },
-  { data: 'avl_end', title: ' SLOT END', width: 90 },
-  { data: 'avl_duration', title: 'AVL DUR...', width: 100 },
-  { data: 'dmd_duration', title: 'DMD DUR...', width: 100 },
   
   {
     data: 'stationFrom',
@@ -158,21 +145,35 @@ export const columns: Handsontable.ColumnSettings[] = [
     width: 100,
   },
   
-  {
-    data: 'direction',
-    title: 'DIRECTION',
-    type: 'text',
-    // selectOptions: ['UP', 'DN', 'BOTH'],
-    width: 90,
-  },
-  
   { data: 'km', title: 'KILOMETER', width: 80 },
+  { data: 'typeOfWork', title: 'WORK TYPE', width: 110 },
+  {
+    data: 'machine',
+    title: 'MACHINE TYPE',
+    //type: 'text',
+    //selectOptions: machineType,
+    width: 150,
+  },
+  { data: 'series', title: 'SERIES', width: 80 },
+  { data: 'quantum', title: 'QUANTUM', width: 100 },
+  { data: 'avl_start', title: ' SLOT START', width: 100 },
+  { data: 'avl_end', title: ' SLOT END', width: 90 },
+  { data: 'avl_duration', title: 'AVL DUR...', width: 100 },
+  { data: 'dmd_duration', title: 'DMD DUR...', width: 100 },
+  
+  
   // { data: 'ni', title: ' NI/Non-NI Work', width: 130 },
   // { data: 'yard', title: 'Yard', width: 70 },
   { data: 'lineNo', title: 'KM/LINE', width: 90 },
+  {
+    data: 'Avl_status',
+    title: 'AVAIL STATUS',
+    type: 'checkbox',
+    defaultData: true,
+    width: 120,
+  },
   
-  
- // { data: 'deputedSupervisor', title: 'DEPUTED SUP...', width: 120 },
+ { data: 'deputedSupervisor', title: 'DEPUTED SUP...', width: 120 },
   //{ data: 'resources', title: 'RESOURCES', width: 100 },
   { data: 'loco', title: 'LOCO', width: 70 },
   { data: 'crew', title: 'CREW', width: 70 },
@@ -184,21 +185,21 @@ export const columns: Handsontable.ColumnSettings[] = [
   // { data: 'tower', title: 'TOWER/MAT...', width: 110 },
   // { data: 'cancelTrain', title: 'TRAIN CANCEL...', width: 130 },
 
-  // {
-  //   data: 'burst',
-  //   title: 'BLOCK DETAILS',
-  //   type: 'select',
-  //   selectOptions: ['BLOCK BURST', 'Block Ended on Time', 'BLOCK EXTENDED'],
-  //   width: 120,
-  // },
+  {
+    data: 'burst',
+    title: 'BLOCK DETAILS',
+    type: 'select',
+    selectOptions: ['BLOCK BURST', 'Block Ended on Time', 'BLOCK EXTENDED'],
+    width: 120,
+  },
 
-  // {
-  //   data: 'integrates',
-  //   title: 'INTEGRATED',
-  //   width: 230,
-  //   editor: false,
-  //   readOnly: true,
-  // },
+  {
+    data: 'integrates',
+    title: 'INTEGRATED',
+    width: 230,
+    editor: false,
+    readOnly: true,
+  },
   // {
   //   data: 'integrated',
   //   title: 'INTEGRATED',
@@ -207,13 +208,7 @@ export const columns: Handsontable.ColumnSettings[] = [
   //   editor: false,
   //   readOnly: true,
   // },
-  // {
-  //   data: 'grant_status',
-  //   title: 'GRANT STATUS',
-  //   type: 'select',
-  //   selectOptions: ['Pending', 'Granted', 'Not Granted'],
-  //   width: 120,
-  // },
+  
    
   // {
   //   data: 'caution',
@@ -228,22 +223,29 @@ export const columns: Handsontable.ColumnSettings[] = [
   //   title: 'CAUTION',
   //   width: 300,
   // },
+  {
+    data: 'cautionLength',
+    title: 'CAUTION LENGTH',
+    width: 150,
+  },
+  {
+      data: 'cautionTdc',
+      title: 'CAUTION TDC',
+      width: 120,
+    },
+  {
+    data: 'cautionSpeed',
+    title: 'CAUTION SPEED',
+    width: 120,
+  },
   // {
-  //   data: 'cautionLength',
-  //   title: 'CAUTION LENGTH',
-  //   width: 160,
+  //   data: 'grant_status',
+  //   title: 'GRANT STATUS',
+  //   type: 'select',
+  //   selectOptions: ['Pending', 'Granted', 'Not Granted'],
+  //   width: 120,
   // },
-  // {
-  //     data: 'cautionTdc',
-  //     title: 'CAUTION TDC',
-  //     width: 160,
-  //   },
-  // {
-  //   data: 'cautionSpeed',
-  //   title: 'CAUTION SPEED',
-  //   width: 160,
-  // },
-  // { data: 'time_granted', title: 'TIME GRANTED', width: 120 },
+  { data: 'time_granted', title: 'TIME GRANTED', width: 120 },
   // { data: 'slot', title: 'SLOTS', width: 70 },
   { data: 'output', title: 'OUTPUT', width: 100 },
   { data: 'OPTG_remarks', title: 'OPTG REMARKS', width: 120 },
