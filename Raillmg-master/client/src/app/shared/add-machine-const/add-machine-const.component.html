@@ -109,7 +109,7 @@
                                     <div class="col-sm-6 col-md-3">
                                         <div class="form-group mt-3 mb-3">
                                             <label>YARD / STATION FROM</label>
-                                            <select class="form-select" formControlName="stationFrom">
+                                            <select class="form-select" formControlName="stationFrom" (change)="onStationSelect(i,$event)">
                                                 <option value="" selected disabled>
                                                     SELECT STATION
                                                 </option>
@@ -150,7 +150,7 @@
                                         <div class="form-group mt-3 mb-3">
                                             <label class="d-flex justify-content-between" class="required">AVAILABLE SLOT
                                                 <div class="me-5"
-                                                    *ngIf=" department.value ==='SIGNAL' || (domain==='machineNonRolls' || domain ==='maintenanceNonRolls')">
+                                                    *ngIf="department.value === 'SIGNAL' || (domain==='machineNonRolls' || domain ==='maintenanceNonRolls')">
                                                     <input type="checkbox" value="Avl_slot_other"
                                                         formControlName="avlSlotOtherCheckBox"
                                                         name="avlSlotOtherCheckBox" required>
@@ -323,10 +323,10 @@
                                     ==="S&T"){ -->
                                     <div class="col-sm-6 col-md-3">
                                         <div class="form-group mt-3 mb-3">
-                                            <label>TRD STAFF </label>
+                                            <label>TPC STAFF </label>
                                             <select class="form-select" formControlName="tpcStaff">
                                                 <option value="" disabled selected>
-                                                    SELECT TRD STAFF
+                                                    SELECT TPC STAFF
                                                 </option>
                                                 <option value="Yes">Yes</option>
                                                 <option value="No">No</option>
@@ -474,54 +474,70 @@
                                                 }
                                             </div>
                                         </div>
-                                        <div class="col-sm-6 col-md-4">
+                                        <div class="col-12">
                                             <div class="form-group mt-3 mb-3">
                                                 <input type="checkbox" formControlName="cautionCheckbox" />
                                                 <label>CAUTION REQUIRED</label>
                                                 @if(machineFormArray.controls[i].get('cautionCheckbox').value){
-                                                <div class="row text-center">
-                                                    <div class="col-3">Length</div>
-                                                    <div class="col-4">TDC</div>
-                                                    <div class="col-3">Speed</div>
-                                                    <div class="col-2">
-                                                        <button type="button" class="btn btn-outline-primary"
-                                                            (click)="addCaution(i)">+</button>
+                                                    <div class="row align-items-center">
+                                                        <div class="col-3">Length</div>
+                                                        <div class="col-3">TDC</div>
+                                                        <div class="col-1">Speed</div> <!-- Reduced width for Speed -->
+                                                        <div class="col-1">MPS</div>
+                                                        <div class="col-2">ID</div> <!-- Increased width for ID -->
+                                                        <div class="col-2">Time Loss</div> <!-- Added column for Time Loss -->
+                                                        <div class="col-2">
+                                                            <button type="button" class="btn btn-outline-primary" (click)="addCaution(i)">+</button>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                                <div class="row text-center"
-                                                    *ngFor="let caution of cautions[i]; let $index = index"
-                                                    [attr.data-index]="i">
-                                                    <div class="col-3 p-0 pe-1">
-                                                        <input type="text" class="form-control"
-                                                            placeholder="ENTER LENGTH OF CAUTION" name="length"
-                                                            (change)="cautionLength($event,i,$index)" required />
+                                                    <div class="row align-items-center" *ngFor="let caution of cautions[i]; let $index = index" [attr.data-index]="i">
+                                                        <div class="col-3 p-0 pe-1">
+                                                            <input type="text" class="form-control" placeholder="ENTER LENGTH OF CAUTION" name="length" (change)="cautionLength($event,i,$index)" required />
+                                                        </div>
+                                                        <div class="col-3 p-0 pe-1">
+                                                            <input type="date" class="form-control" placeholder="ENTER TDC OF CAUTION" name="tdc" (change)="cautionTDC($event,i,$index)" required />
+                                                        </div>
+                                                        <div class="col-1 p-0 pe-1"> <!-- Reduced width for Speed -->
+                                                            <input type="number" class="form-control" placeholder="ENTER SPEED OF CAUTION" name="speed" (change)="cautionSpeed($event,i,$index)" required />
+                                                        </div>
+                                                        <div class="col-1 p-0 pe-1">
+                                                            <div class="form-group mt-3 mb-3">
+                                                                <select class="form-control" name="cautionMps">
+                                                                    <option>{{ machineFormArray.at(i)?.get('caution')?.value?.mps }}</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="col-2 p-0 pe-1"> <!-- Increased width for ID -->
+                                                            <div class="form-group mt-3 mb-3">
+                                                                <input type="text" class="form-control" placeholder="ID" name="id" [value]="cautionMps + '/' + caution?.speed + '/' + (caution?.length / 100)" readonly />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-2 p-0 pe-1">
+                                                            <div class="form-group mt-3 mb-3">
+                                                                <input type="text" class="form-control" placeholder="{{ cautions[i][$index]['timeloss'] }}">
+                                                            </div>
+                                                        </div>
+                                                        
+                                                                <!-- Display the corresponding time loss here based on the ID -->
+                                                                <!-- Replace 'TIME_LOSS' with your time loss calculation -->
+                                                                <!-- <input type="text" class="form-control" placeholder="Time Loss" name="timeLoss" [value]="calculateTimeLoss(caution,i,$index)" readonly /> -->
+                                                                
+                                                               
+                                                            
+                                                        
+                                                        <div class="col-2">
+                                                            <button type="button" class="btn btn-outline-danger" (click)="deleteCaution(i,$index)">x</button>
+                                                        </div>
                                                     </div>
-                                                    <div class="col-4 p-0 pe-1">
-                                                        <input type="date" class="form-control"
-                                                            placeholder="ENTER TDC OF CAUTION" name="tdc"
-                                                            (change)="cautionTDC($event,i,$index)" required />
-                                                    </div>
-                                                    <!-- <div class="col-4 p-0 pe-1">
-                                                        <select>
-                                                            @for(ele of dists; track $index ){
-                                                            <option>{{ele.dist}}</option>
-                                                            }
-                                                        </select>
-                                                    </div> -->
-                                                    <div class="col-3 p-0 pe-1">
-                                                        <input type="number" class="form-control"
-                                                            placeholder="ENTER SPEED OF CAUTION" name="speed"
-                                                            (change)="cautionSpeed($event,i,$index)" required />
-                                                    </div>
-                                                    <div class="col-2">
-                                                        <button type="button" class="btn btn-outline-danger"
-                                                            (click)="deleteCaution(i,$index)">x</button>
-                                                    </div>
-                                                </div>
                                                 }
-
                                             </div>
                                         </div>
+                                        
+                                    
+
+                                        
+                                        
                                         <!-- <div class="col-sm-6 col-md-3">
                                             <div class="form-group mt-3 mb-3">
                                                 <input type="checkbox" formControlName="cancelTrainCheckbox" />

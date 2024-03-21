@@ -238,6 +238,11 @@ export const columns: Handsontable.ColumnSettings[] = [
     title: 'CAUTION SPEED',
     width: 120,
   },
+  {
+    data: 'cautionTimeLoss',
+    title: 'TIME LOSS',
+    width: 120, 
+  },
   // {
   //   data: 'grant_status',
   //   title: 'GRANT STATUS',

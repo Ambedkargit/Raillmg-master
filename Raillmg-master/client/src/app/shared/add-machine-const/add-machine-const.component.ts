@@ -28,7 +28,7 @@ import { Router } from 'express';
 import { PopupService } from '@ng-bootstrap/ng-bootstrap/util/popup';
 import { Injectable } from '@angular/core';
 import { authGuard } from '../service/auth-guard.service';
-
+import { cautionTimeLoss } from '../constants/cautioncalculation';
 @Component({
   selector: 'app-add-machine-const',
   standalone: true,
@@ -76,6 +76,7 @@ export class AddMachineConstComponent implements OnInit {
     date: '',
     startTime: '',
     endTime: '',
+    timeLoss: 0,
 
   };
   slotIndex: any;
@@ -96,7 +97,8 @@ export class AddMachineConstComponent implements OnInit {
   isSlotSelected: boolean = false;
   toastr: any;
   myForm: FormGroup;
-
+  cautionMps: any;
+  index: any;
   onSlotSelect(event: any) {
       // You can adjust the condition based on the event to determine if a slot is selected.
       this.isSlotSelected = event && event.length > 0;
@@ -191,6 +193,25 @@ export class AddMachineConstComponent implements OnInit {
   onSectionSelect(index, event) {
     let data = this.dataSet.filter((ele) => ele.section === event.target.value);
     this.railDetails[index] = data[0];
+  }
+
+  onStationSelect(index, event) {
+    this.service
+      .getAllRailDetails('stations?stations=' + event.target.value)
+      .subscribe((res) => {
+        console.log(index, res);
+  
+        // Check if machineFormArray and caution at index exist
+        if (this.machineFormArray && this.machineFormArray.value[index]?.caution) {
+          // Update caution's mps
+          this.machineFormArray.value[index].caution.mps = res[0]?.mps || 0;
+          this.cautionMps = res[0]?.mps || 0; // Assigning the mps value to cautionMps property
+          console.log(this.machineFormArray.value[index].caution);
+        } else {
+          console.error(`Invalid index or caution object at index ${index}`);
+        }
+      });
+    console.log(event.target.value);
   }
 
   onSubmit() {
@@ -306,6 +327,7 @@ export class AddMachineConstComponent implements OnInit {
       board: '',
       section: '',
       mps: 0,
+      timeLoss: 0,
       slots: [],
       directions: [],
       stations: [],
@@ -344,14 +366,14 @@ export class AddMachineConstComponent implements OnInit {
       crewCheckbox: [false],
       loco: [null],
       cautionCheckbox: [false],
-      caution: [{ length: '', tdc: '', speed: 0 }],
+      caution: [{ length: '', tdc: '', speed: 0 , mps: 0, id:'', timeloss: 0}],
       locoCheckbox: [false],
       // cancelTrain: [null],
       cancelTrainCheckbox: [false],
       integratedCheckbox: [false],
       integrated: [{ block: '', section1: '', duration: 0 }],
     });
-    this.cautions.push([{ length: '', tdc: '', speed: 0 }]);
+    this.cautions.push([{ length: '', tdc: '', speed: 0, mps: 0, id:'', timeloss: 0}]);
     this.integrates.push([{ block: '', section1: '', duration: 0 }]);
     this.machineFormArray.push(machineForm);
 
@@ -369,7 +391,7 @@ export class AddMachineConstComponent implements OnInit {
   }
 
   addCaution(index) {
-    this.cautions[index].push({ length: '', tdc: '', speed: 0 });
+    this.cautions[index].push({ length: '', tdc: '', speed: 0, mps: 0, id:'', timeloss: 0});
   }
 
   addIntegrated(index) {
@@ -398,10 +420,12 @@ export class AddMachineConstComponent implements OnInit {
 
   cautionLength($event, index1, index2) {
     this.cautions[index1][index2]['length'] = $event.target.value;
+    this.calculateTimeLoss(this.cautions[index1][index2],index1,index2)
   }
 
   cautionSpeed($event, index1, index2) {
     this.cautions[index1][index2]['speed'] = $event.target.value;
+    this.calculateTimeLoss(this.cautions[index1][index2],index1,index2)
   }
 
   cautionTDC($event, index1, index2) {
@@ -410,6 +434,24 @@ export class AddMachineConstComponent implements OnInit {
     var month = parts[1];
     var day = parts[2];
     this.cautions[index1][index2]['tdc'] = day + '/' + month + '/' + year;
+    this.calculateTimeLoss(this.cautions[index1][index2],index1,index2)
+  }
+  
+  
+
+  // Function to generate ID
+  calculateTimeLoss(caution,index1,index2) {
+    console.log(caution,index1,index2)
+    if (this.cautionMps==0 || caution.speed==0 || caution.length==0){
+      return
+     }
+    const id = this.cautionMps + '/' + caution.speed + '/' + (caution.length / 100)
+    console.log('Requested ID for Time Loss:', id);
+    const entry = cautionTimeLoss.find(item => item.ID === id);
+    console.log('Time Loss Entry:', entry);
+    this.cautions[index1][index2]['timeloss']=entry.Time_Loss
+    console.log('-----',entry.Time_Loss,entry)
+    // return entry ? entry.Time_Loss : 0; // Return 0 if ID not found
   }
 
   integratedBlock($event, index1, index2) {

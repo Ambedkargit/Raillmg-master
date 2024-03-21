@@ -148,19 +148,22 @@ export class EditMachineRollComponent {
               let cSpeed = '';
               let cLength = '';
               let cTdc = '';
+              let cTimeLoss ='';
               for (let ele of item.caution) {
                 cLength += `${ele.length}  \n`;
                 cSpeed += `${ele.speed}  \n`;
                 cTdc += `${ ele.tdc} \n`;
+                cTimeLoss +=ele.timeloss? `${ ele.timeloss} \n`:''; 
               }
 
               item.cautionLength = cLength;
               item.cautionSpeed = cSpeed;
               item.cautionTdc = cTdc;
+              item.cautionTimeLoss= cTimeLoss;
+               
 
               return item;
               });
-            
 
             data = data.filter(
                 (item) =>

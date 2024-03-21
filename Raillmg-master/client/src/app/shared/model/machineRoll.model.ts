@@ -47,6 +47,7 @@ export interface IMachineRoll {
   slots: string;
   output: string;
   OPTG_remarks: string;
+  mps: number;
 }
 
 export interface ILog {

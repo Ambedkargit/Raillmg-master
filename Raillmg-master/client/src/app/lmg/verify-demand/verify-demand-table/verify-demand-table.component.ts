@@ -152,6 +152,11 @@ export class VerifyDemandTableComponent implements OnInit {
       width: 120,
     },
     {
+      data: 'cautionTimeLoss',
+      title: 'TIME LOSS',
+      width: 120, 
+    },
+    {
       data: 'grant_status',
       title: 'GRANT STATUS',
       type: 'select',
@@ -196,7 +201,7 @@ export class VerifyDemandTableComponent implements OnInit {
 
   hotSettings: Handsontable.GridSettings = {
     ...hotSettings,
-    height: '100vh',
+    height: '74vh',
     columns: this.columns,
     afterChange: (changes) => {
       changes?.forEach(([row, prop, oldValue, newValue]) => {
@@ -206,7 +211,7 @@ export class VerifyDemandTableComponent implements OnInit {
         }
         const hot = this.hotRegisterer.getInstance(this.id);
         let id = hot.getDataAtRow(row)[0];
-        const url = hot.getDataAtRow(row)[36];
+        const url = hot.getDataAtRow(row)[37];
         console.log(hot.getDataAtRow(row));
         if (oldValue == newValue || (newValue == '' && oldValue == undefined)) {
           return;
@@ -315,15 +320,19 @@ export class VerifyDemandTableComponent implements OnInit {
             let cSpeed = '';
             let cLength = '';
             let cTdc = '';
+            let cTimeLoss= '';
+
             for (let ele of item.caution) {
               cLength += `${ele.length}  \n`;
               cSpeed += `${ele.speed}  \n`; 
-              cTdc += `${ ele.tdc} \n`;
+              cTdc += `${ ele.tdc} \n` ;
+              cTimeLoss +=ele.timeloss? `${ ele.timeloss} \n`:''; 
             }
 
             item.cautionLength = cLength;
             item.cautionSpeed = cSpeed;
             item.cautionTdc = cTdc;
+            item.cautionTimeLoss=cTimeLoss;
             return item;
           
           });
