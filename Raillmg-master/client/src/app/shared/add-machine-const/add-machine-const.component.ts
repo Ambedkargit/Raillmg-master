@@ -97,7 +97,7 @@ export class AddMachineConstComponent implements OnInit {
   isSlotSelected: boolean = false;
   toastr: any;
   myForm: FormGroup;
-  cautionMps: any;
+  cautionMps: any = 0;
   index: any;
   onSlotSelect(event: any) {
       // You can adjust the condition based on the event to determine if a slot is selected.
@@ -269,7 +269,7 @@ export class AddMachineConstComponent implements OnInit {
         item.integrated = this.integrates[index];
 
         const dt = DateTime.now();
-        const startTime = DateTime.fromFormat(splitSlot[2], 'HH:mm');
+        const startTime = DateTime.fromFormat(splitSlot[1], 'HH:mm');
         let endTime = DateTime.fromFormat(splitSlot[3], 'HH:mm');
         
         // Adjust endTime if it's less than startTime

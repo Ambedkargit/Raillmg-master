@@ -226,7 +226,13 @@ export class MachineRollComponent implements OnInit {
 
       return false;
     });
-
+     // Sort the filtered data by date in ascending order
+    data.sort((a, b) => {
+      const dateA = DateTime.fromFormat(a.date, 'dd/MM/yyyy');
+      const dateB = DateTime.fromFormat(b.date, 'dd/MM/yyyy');
+      return dateA.toMillis() - dateB.toMillis();
+    });
+  
     hot.updateData(data);
   }
 

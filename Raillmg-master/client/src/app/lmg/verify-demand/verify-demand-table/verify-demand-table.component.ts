@@ -45,7 +45,7 @@ export class VerifyDemandTableComponent implements OnInit {
     {
       data: 'Dmd_remarks',
       title: 'DEMAND REMARKS',
-      width: 130,
+      width: 160,
     },
     {
       data: 'status',
@@ -91,10 +91,12 @@ export class VerifyDemandTableComponent implements OnInit {
       // selectOptions: stationList,
       width: 100,
     },
-    { data: 'km', title: 'KILOMETER', width: 80 },
+    { data: 'km', title: 'KILOMETER', width: 120 },
     { data: 'lineNo', title: 'LINE', width: 60 },
     { data: 'typeOfWork', title: 'TYPE OF WORK', width: 120 },
     { data: 'machine', title: 'MACHINE TYPE', width: 120 },
+    { data: 'time_granted', title: 'TIME GRANTED', width: 120 },
+    { data: 'output', title: 'OUTPUT', width: 120 },
     { data: 'quantum', title: 'QUANTUM', width: 120 },
     { data: 'series', title: 'SERIES', width: 80 },
     { data: 'avl_start', title: 'SLOT START', width: 100 },
@@ -163,11 +165,11 @@ export class VerifyDemandTableComponent implements OnInit {
       selectOptions: ['Pending', 'Granted', 'Not Granted'],
       width: 120,
     },
-    { data: 'time_granted', title: 'TIME GRANTED', width: 120 },
+    
     { data: 'slots', title: 'SLOTS', width: 120 },
-    { data: 'output', title: 'OUTPUT', width: 120 },
+   
     { data: 'OPTG_remarks', title: 'OPTG Remarks', width: 120 },
-    { data: 'rollfrom', title: 'ROLL FROM', width: 100 },
+    { data: 'rollfrom', title: 'ROLL FROM', width: 180 },
     {
       data: 'logs',
       title: 'EDIT HISTORY',
@@ -248,9 +250,9 @@ export class VerifyDemandTableComponent implements OnInit {
       }
       let cp = {
         className:
-          this.dataSet[row].status == 'Reject'
+          this.dataSet[row]?.status == 'Reject'
             ? 'redCell'
-            : this.dataSet[row].status == 'Accept'
+            : this.dataSet[row]?.status == 'Accept'
             ? 'greenCell'
             : '',
       };

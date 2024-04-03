@@ -98,10 +98,36 @@
             </li>
           </ul>
         </li> -->
-        <li class="nav-item">
-          <a class="nav-link active" role="button" [routerLink]="['report']">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false" >
             Report
           </a>
+          <ul class="dropdown-menu">
+            <li>
+            <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+            [routerLink]="['report', 'machineRolls']">Machine Rolls</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+              [routerLink]="['report', 'machineNonRolls']">Machine (Out of Rolling Block)</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+              [routerLink]="['report', 'maintenanceRolls']">Maintenance Rolls</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+              [routerLink]="['report', 'maintenanceNonRolls']">Maintenance (Out of Rolling Block)</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+              [routerLink]="['report', 'all-rolling']">All Rolling</a>
+            </li>
+            <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+              [routerLink]="['report', 'all-non-rolling']">All Non Rolling</a>
+            </li>
+          </ul>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -144,13 +170,26 @@
           </a>
         </li>
         }
-        @if(userData["username"]==='SRDOM' || userData["username"]==='Ambedkar' ){
-          <li class="nav-item ">
-            <a class="nav-link  active" role="button" [routerLink]="['sign']">
-               Digital Sign
-            </a>
+        <!-- @if(userData["username"]==='SRDOM' || userData["username"]==='Ambedkar' ){
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle active" role="button" data-bs-toggle="dropdown" aria-expanded="false">Sign</a>
+     
+          <ul class="dropdown-menu">
+              <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+              [routerLink]="['sign', 'rolling']">Rolling Block Demand</a>
+              </li>
+              <li>
+              <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+              [routerLink]="['sign', 'non-Rolling']">Non-Rolling Block Demand</a>
+              </li>
+              <li>
+                <a class="dropdown-item" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown"
+                [routerLink]="['sign','digital-sign']">Digital Sign</a>
+                </li>
+          </ul>
           </li>
-        }
+        } -->
       </ul>
       
 

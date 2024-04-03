@@ -153,7 +153,7 @@
                                                     *ngIf="department.value === 'SIGNAL' || (domain==='machineNonRolls' || domain ==='maintenanceNonRolls')">
                                                     <input type="checkbox" value="Avl_slot_other"
                                                         formControlName="avlSlotOtherCheckBox"
-                                                        name="avlSlotOtherCheckBox" required>
+                                                        name="avlSlotOtherCheckBox">
                                                     OTHERS
                                                 </div>
                                             </label>
@@ -355,7 +355,7 @@
 
                                             @if(domain==='machineRolls'|| domain==='maintenanceRolls'){
 
-                                            <label>WHETHER NI WORK/PNI WORK OR NON-NI WORK</label>
+                                            <label>WHETHER NI/PNI /NON-NI WORK</label>
                                             <select class="form-select" formControlName="ni">
                                                 <option value="NON NI" selected>
                                                     NON NI
@@ -478,23 +478,24 @@
                                             <div class="form-group mt-3 mb-3">
                                                 <input type="checkbox" formControlName="cautionCheckbox" />
                                                 <label>CAUTION REQUIRED</label>
-                                                @if(machineFormArray.controls[i].get('cautionCheckbox').value){
+                                                <ng-container *ngIf="machineFormArray.controls[i].get('cautionCheckbox').value">
                                                     <div class="row align-items-center">
-                                                        <div class="col-3">Length</div>
-                                                        <div class="col-3">TDC</div>
+                                                        <div class="col-2">Length</div>
+                                                        <div class="col-2">TDC</div>
                                                         <div class="col-1">Speed</div> <!-- Reduced width for Speed -->
                                                         <div class="col-1">MPS</div>
                                                         <div class="col-2">ID</div> <!-- Increased width for ID -->
                                                         <div class="col-2">Time Loss</div> <!-- Added column for Time Loss -->
+                                                    
                                                         <div class="col-2">
                                                             <button type="button" class="btn btn-outline-primary" (click)="addCaution(i)">+</button>
                                                         </div>
                                                     </div>
                                                     <div class="row align-items-center" *ngFor="let caution of cautions[i]; let $index = index" [attr.data-index]="i">
-                                                        <div class="col-3 p-0 pe-1">
+                                                        <div class="col-2 p-0 pe-1">
                                                             <input type="text" class="form-control" placeholder="ENTER LENGTH OF CAUTION" name="length" (change)="cautionLength($event,i,$index)" required />
                                                         </div>
-                                                        <div class="col-3 p-0 pe-1">
+                                                        <div class="col-2 p-0 pe-1">
                                                             <input type="date" class="form-control" placeholder="ENTER TDC OF CAUTION" name="tdc" (change)="cautionTDC($event,i,$index)" required />
                                                         </div>
                                                         <div class="col-1 p-0 pe-1"> <!-- Reduced width for Speed -->
@@ -505,33 +506,25 @@
                                                                 {{ machineFormArray.at(i)?.get('caution')?.value?.mps }}
                                                             </div>
                                                         </div>
-                                                        
-                                                        <div class="col-2 p-0 pe-1"> 
+                                                        <div class="col-2 p-0 pe-1">
                                                             <div class="form-group mt-3 mb-3">
                                                                 {{ cautionMps + '/' + caution?.speed + '/' + (caution?.length / 100) }}
                                                             </div>
                                                         </div>
-                                                        
                                                         <div class="col-2 p-0 pe-1">
                                                             <div class="form-group mt-3 mb-3">
                                                                 {{ cautions[i][$index]['timeloss'] }}
                                                             </div>
                                                         </div>
                                                         
-                                                                <!-- Display the corresponding time loss here based on the ID -->
-                                                                <!-- Replace 'TIME_LOSS' with your time loss calculation -->
-                                                                <!-- <input type="text" class="form-control" placeholder="Time Loss" name="timeLoss" [value]="calculateTimeLoss(caution,i,$index)" readonly /> -->
-                                                                
-                                                               
-                                                            
-                                                        
                                                         <div class="col-2">
                                                             <button type="button" class="btn btn-outline-danger" (click)="deleteCaution(i,$index)">x</button>
                                                         </div>
                                                     </div>
-                                                }
+                                                </ng-container>
                                             </div>
                                         </div>
+                                        
                                         
                                     
 
