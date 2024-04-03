@@ -14,9 +14,11 @@ import { AddDetailsComponent } from './lmg/admin-dashboard/add-details.component
 import { MachineRollComponent } from './lmg/report/machine-roll/machine-roll.component';
 import { ReportComponent } from './lmg/report/report.component';
 import { UserDetailsComponent } from './lmg/user-details/user-details.component';
-import { SignComponent } from './lmg/sign/sign.component';
 import { RollingDemandComponent } from './lmg/verify-demand/rolling-demand/rolling-demand.component';
 import { NonRollingDemandComponent } from './lmg/verify-demand/non-rolling-demand/non-rolling-demand.component';
+import { SignNonRollingDemandComponent } from './lmg/sign/sign-non-rolling-demand/sign-non-rolling-demand.component';
+import { SignRollingDemandComponent } from './lmg/sign/sign-rolling-demand/sign-rolling-demand.component';
+import { DigitalSignComponent } from './lmg/sign/digital-sign/digital-sign.component';
 
 export const routes: Routes = [
   {
@@ -63,36 +65,36 @@ export const routes: Routes = [
       },
       {
         path: 'report',
-        component: ReportComponent,
+        // component: ReportComponent,
         children: [
           {
             path: ':id',
             component: MachineRollComponent,
           },
-          // {
-          //   path: 'machineRolls',
-          //   component: MachineRollComponent,
-          // },
-          // {
-          //   path: 'machineNonRolls',
-          //   component: MachineRollComponent,
-          // },
-          // {
-          //   path: 'maintenanceRolls',
-          //   component: MachineRollComponent,
-          // },
-          // {
-          //   path: 'maintenanceNonRolls',
-          //   component: MachineRollComponent,
-          // },
-          // {
-          //   path: 'all-rolling',
-          //   component: MachineRollComponent,
-          // },
-          // {
-          //   path: 'all-non-rolling',
-          //   component: MachineRollComponent,
-          // },
+          {
+            path: 'machineRolls',
+            component: MachineRollComponent,
+          },
+          {
+            path: 'machineNonRolls',
+            component: MachineRollComponent,
+          },
+          {
+            path: 'maintenanceRolls',
+            component: MachineRollComponent,
+          },
+          {
+            path: 'maintenanceNonRolls',
+            component: MachineRollComponent,
+          },
+          {
+            path: 'all-rolling',
+            component: MachineRollComponent,
+          },
+          {
+            path: 'all-non-rolling',
+            component: MachineRollComponent,
+          },
         ],
       },
       {
@@ -109,7 +111,12 @@ export const routes: Routes = [
       },
       {
         path: 'sign',
-        component:SignComponent,
+        // component:SignComponent,
+        children: [
+          { path: 'rolling', component: SignRollingDemandComponent},
+          { path: 'non-Rolling', component: SignNonRollingDemandComponent},
+          { path: 'digital-sign', component: DigitalSignComponent },
+          ],
       },
     ],
   },
