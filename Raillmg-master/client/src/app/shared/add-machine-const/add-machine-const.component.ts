@@ -269,7 +269,7 @@ export class AddMachineConstComponent implements OnInit {
         item.integrated = this.integrates[index];
 
         const dt = DateTime.now();
-        const startTime = DateTime.fromFormat(splitSlot[1],  'HH:mm');
+        const startTime = DateTime.fromFormat(splitSlot[1], 'HH:mm');
         let endTime = DateTime.fromFormat(splitSlot[3], 'HH:mm');
         
         // Adjust endTime if it's less than startTime

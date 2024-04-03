@@ -67,34 +67,34 @@ export const routes: Routes = [
         path: 'report',
          //component: ReportComponent,
         children: [
+        {
+          path: ':id',
+          component: MachineRollComponent,
+        },
           {
-            path: ':id',
+            path: 'machineRolls',
             component: MachineRollComponent,
           },
-            {
-              path: 'machineRolls',
-              component: MachineRollComponent,
-            },
-            {
-              path: 'machineNonRolls',
-              component: MachineRollComponent,
-            },
-            {
-              path: 'maintenanceRolls',
-              component: MachineRollComponent,
-            },
-            {
-              path: 'maintenanceNonRolls',
-              component: MachineRollComponent,
-            },
-            {
-              path: 'all-rolling',
-              component: MachineRollComponent,
-            },
-            {
-              path: 'all-non-rolling',
-              component: MachineRollComponent,
-            },
+          {
+            path: 'machineNonRolls',
+            component: MachineRollComponent,
+          },
+          {
+            path: 'maintenanceRolls',
+            component: MachineRollComponent,
+          },
+          {
+            path: 'maintenanceNonRolls',
+            component: MachineRollComponent,
+          },
+          {
+            path: 'all-rolling',
+            component: MachineRollComponent,
+          },
+          {
+            path: 'all-non-rolling',
+            component: MachineRollComponent,
+          },
         ],
       },
       {

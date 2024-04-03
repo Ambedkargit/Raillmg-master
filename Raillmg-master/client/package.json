@@ -34,6 +34,7 @@
     "ng-multiselect-dropdown": "^1.0.0",
     "papaparse": "^5.4.1",
     "pdf-lib": "^1.17.1",
+    "pspdfkit": "^2024.2.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "xlsx": "^0.18.5",

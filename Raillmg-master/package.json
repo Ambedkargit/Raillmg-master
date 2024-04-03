@@ -1,5 +1,9 @@
 {
   "dependencies": {
     "jsrsasign": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.73",
+    "@types/react-dom": "^18.2.23"
   }
 }
