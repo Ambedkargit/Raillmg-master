@@ -16,3 +16,10 @@
 li {
   margin-top: 10px;
 }
+.table-scrollable {
+  overflow-x: auto;
+  max-height: 500px;
+}
+.blue-heading {
+  color: blue; /* Set the color to blue */
+}

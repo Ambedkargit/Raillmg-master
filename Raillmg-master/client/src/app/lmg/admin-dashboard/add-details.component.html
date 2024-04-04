@@ -403,6 +403,79 @@
             </div>
           </ng-template>
         </ng-container>
+
+        <ng-container ngbNavItem="add-report">
+          <button ngbNavLink (click)="onTabChange()">GENERATE REPORT</button>
+          <ng-template ngbNavContent>
+            <div class="row">
+              <div class="col-6">
+                
+                <input id="typeahead-format" placeholder="ENTER REPORT NAME" #reportNameInput class="form-control mt-3 mb-3" type="text" name="add-report">
+
+                <select class="form-select mt-3 mb-3" (change)="OnSelectRolling($event)">
+                  <option value="" selected disabled>SELECT ROLLING/NON-ROLLING</option>
+                  <option value="ROLLING">ROLLING</option>
+                  <option value="NON-ROLLING">NON-ROLLING</option>
+                  <option value="ROLLING / NON-ROLLING">ALL ROLLING & NON-ROLLING</option>
+                </select>
+                <!-- <label>BOARD</label> -->
+                <select class="form-select mt-3 mb-3" (change)="onSelectBoard($event)">
+                  <option value="" selected disabled>SELECT BOARD</option>
+                  <option value="{{board}}" *ngFor="let board of boardList">{{board}}</option>
+                </select>
+                
+                <div class="row w-100">
+                  <div class="col-2">
+                    <h4 class="text-end fw-semibold">Filter:</h4>
+                  </div>
+                  <div class="col-3">
+                    <label>From: </label>
+                    <input type="date" (change)="selectStartDate($event)" class="form-control">
+                  </div>
+                  <div class="col-3">
+                    <label>To: </label>
+                    <input type="date" (change)="selectEndDate($event)" class="form-control">
+                  </div>
+                  
+                  <!-- <div class="col-2">
+                    <button class="btn btn-primary" (click)="ResetDates()">Reset</button>
+                  </div> -->
+                </div>
+                <button class="btn btn-primary form-control mt-3" (click)="generateReport()">GENERATE REPORT</button>
+                <!-- <button class="btn btn-primary form-control mt-3" (click)="downloadPDF()">DOWNLOAD PDF</button> -->
+                <button class="btn btn-primary form-control mt-3" (click)="downloadExcel()">DOWNLOAD EXCEL</button>
+                
+                <!-- Display the preview here -->
+                <div id="report-preview" *ngIf="generatedReport" class="table-scrollable">
+                  <label></label>
+                  <table class="table table-bordered">
+                      <thead>
+                          <tr>
+                              <th *ngFor="let column of generatedReport.selectedColumns" class="blue-heading">{{ column.toUpperCase() }}</th>
+                              <!-- Convert the column headings to uppercase using Angular's toUpperCase method -->
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr *ngFor="let row of generatedReport.reportData">
+                              <td *ngFor="let column of generatedReport.selectedColumns">{{ row[column] }}</td>
+                          </tr>
+                      </tbody>
+                  </table>
+              </div>
+              
+              </div>
+              <div class="col-6">
+                <label>COLUMNS</label>
+                <div class="form-check" *ngFor="let column of columns">
+                  <input class="form-check-input" type="checkbox" [id]="column.title" [value]="column.data" (change)="onColumnSelectionChange(column.data)">
+                  <label class="form-check-label" [for]="column.data">{{ column.data }}</label>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </ng-container>
+        
+
       </div>
       <div [ngbNavOutlet]="nav" class="ms-4"></div>
     </div>

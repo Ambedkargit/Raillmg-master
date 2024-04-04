@@ -7,6 +7,13 @@ import { NgbNavModule, NgbTimepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { IRailForm } from '../../shared/model/railForm.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import { localStorageService } from '../../shared/service/local-storage.service';
+import { columns } from '../../shared/constants/table-columns';
+import Handsontable from 'handsontable';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
+import { DateTime } from 'luxon';
+import { HotTableModule, HotTableRegisterer } from '@handsontable/angular';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-add-details',
@@ -22,6 +29,175 @@ import { localStorageService } from '../../shared/service/local-storage.service'
   styleUrl: './add-details.component.css',
 })
 export class AddDetailsComponent implements OnInit {
+  
+
+columns: any[] = columns; // Assign the columns array
+// dataSet: any[] = [];
+selectedColumns: string[] = [];
+generatedReport :any;
+  startDate: any;
+  endDate: any;
+  dataset: any;
+  filteredData: any[];
+  selectedBoard: any;
+
+generateReport() {
+  console.log('Generating report with columns:', this.selectedColumns);
+  console.log('DataSet:', this.dataSet);
+  this.generatedReport = this.generateReportLogic(this.selectedColumns);
+}
+generateReportLogic(selectedColumns: string[]): any {
+  if (!this.dataSet || this.dataSet.length === 0) {
+    console.error('Dataset is empty or undefined!');
+    return null; // Return null or handle error appropriately
+  }
+
+  // Filter the dataset based on the selected date range
+  const filteredData = this.dataSet.filter(item => {
+    // Ensure the 'date' property exists and is valid
+    if (!item.date || typeof item.date !== 'string'||
+    !item.board || typeof item.board !== 'string') {
+      return false;
+    }
+
+    const parsedDate = DateTime.fromFormat(item.date, 'dd/MM/yyyy');
+
+    // Check if the parsedDate falls within the selected date range
+    if (
+      (this.startDate === undefined || this.startDate <= parsedDate) &&
+      (this.endDate === undefined || this.endDate >= parsedDate)
+      &&
+      (this.selectedBoard === undefined || this.selectedBoard === item.board)
+    ) {
+      return true;
+    }
+
+    return false;
+  }).map(item => {
+    // Create a filtered item object with selected columns
+    const filteredItem: any = {};
+    selectedColumns.forEach(column => {
+      // Check if column exists in item before accessing it
+      if (item.hasOwnProperty(column)) {
+        filteredItem[column] = item[column];
+      } else {
+        console.warn(`Column "${column}" not found in dataset row!`);
+      }
+    });
+    return filteredItem;
+  });
+  filteredData.sort((a, b) => {
+    const dateA = DateTime.fromFormat(a.date, 'dd/MM/yyyy');
+    const dateB = DateTime.fromFormat(b.date, 'dd/MM/yyyy');
+    return dateA.toMillis() - dateB.toMillis();
+  });
+
+  // Construct the report object
+  const report = {
+    selectedColumns: selectedColumns,
+    reportData: filteredData
+  };
+
+  return report;
+}
+onColumnSelectionChange(columnTitle: string) {
+  const index = this.selectedColumns.indexOf(columnTitle);
+  if (index === -1) {
+    this.selectedColumns.push(columnTitle);
+  } else {
+    this.selectedColumns.splice(index, 1);
+  }
+}
+
+// downloadPDF() {
+//   const element = document.getElementById('report-preview');
+//   const reportNameInput = document.getElementById('typeahead-format') as HTMLInputElement;
+
+//   if (!element || !reportNameInput) {
+//     console.error('Element not found');
+//     return;
+//   }
+
+//   const originalStyle = element.style.overflow;
+//   element.style.overflow = 'visible'; // Set overflow to visible to capture entire content
+
+//   html2canvas(element, { 
+//     scrollX: 0, 
+//     scrollY: 0, 
+//     width: document.documentElement.scrollWidth, 
+//     height: document.documentElement.scrollHeight 
+//   }).then((canvas) => {
+//     const imgData = canvas.toDataURL('image/png');
+//     const pdf = new jsPDF();
+//     const imgWidth = 210;
+//     const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+//     pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+
+//     // Reset overflow style
+//     element.style.overflow = originalStyle;
+
+//     // Download PDF with the name from the input field
+//     const fileName = reportNameInput.value.trim() || 'generated_report';
+//     pdf.save(${fileName}.pdf);
+//   });
+// }
+
+downloadExcel() {
+  const reportData = this.generateReportLogic(this.selectedColumns);
+
+  if (!reportData || reportData.reportData.length === 0) {
+    console.error('No data available for download');
+    return;
+  }
+
+  // Create a new workbook
+  const wb = XLSX.utils.book_new();
+
+  // Convert column headings to uppercase
+  const uppercaseColumns = reportData.selectedColumns.map(column => column.toUpperCase());
+
+  // Convert report data to worksheet data array
+  const wsData = [uppercaseColumns, ...reportData.reportData.map(row =>
+    reportData.selectedColumns.map(column => {
+      const value = row[column];
+      // Format values as objects to handle commas and special characters
+      if (value === null) {
+        return { v: '', t: 's' }; // Leave the cell blank
+      } else {
+        return { v: value, t: typeof value === 'string' ? 's' : 'n' };
+      }
+    })
+  )];
+
+  // Convert worksheet data array to worksheet
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+  // Add worksheet to workbook
+  XLSX.utils.book_append_sheet(wb, ws, 'Report');
+
+  // Generate a Blob object containing the workbook data
+  const wbData = XLSX.write(wb, { type: 'array', bookType: 'xlsx' });
+
+  // Convert workbook data to a Blob object
+  const wbBlob = new Blob([wbData], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+  // Trigger download
+  const fileName = (document.getElementById('typeahead-format') as HTMLInputElement).value.trim() || 'generated_report';
+  this.saveBlob(wbBlob, `${fileName}.xlsx`);
+}
+
+saveBlob(blob: Blob, fileName: string) {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.setAttribute('download', fileName);
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+
   active = 'board';
   board = '';
   section = '';
@@ -35,7 +211,7 @@ export class AddDetailsComponent implements OnInit {
   sectionList = [];
   machineList = [];
   selectIndex: number;
-  dataSet = [];
+  dataSet: any[] = [];
 
   directions = [
     {
@@ -93,7 +269,9 @@ export class AddDetailsComponent implements OnInit {
     'FRIDAY',
     'SATURDAY',
   ];
+  
   boardDataset = [];
+createReport: any;
   constructor(
     private service: AppService,
     private toastService: ToastService,
@@ -123,11 +301,106 @@ export class AddDetailsComponent implements OnInit {
         this.machineList = data;
       });
     });
+    
+    
   }
+OnSelectRolling(e){
+ console.log(e.target.value)
+ let title=e.target.value
+ let domain = [];
+ this.dataSet = [];
+      if (title == 'ROLLING') {
+        domain = ['machineRolls', 'maintenanceRolls'];
+      } else if (title === 'NON-ROLLING') {
+        domain = ['maintenanceNonRolls', 'machineNonRolls'];
+      } 
+      else if (title === 'ROLLING / NON-ROLLING') {
+        domain = ['machineRolls', 'maintenanceRolls', 'maintenanceNonRolls', 'machineNonRolls'];
+      }
+  for (let ele of domain) {
+    Promise.resolve().then(() => {
+      this.service.getAllMachineRoll(ele).subscribe((data) => {
+        data = data.map((item) => {
+
+          // Integrate values into 'item.integrates'
+          let Itemp = '';
+          for (let ele of item.integrated) { 
+          Itemp += `BLOCK: ${ele.block !== undefined ? ele.block : '-'} | SECTION: ${ele.section1 !== undefined ? ele.section1 : '-'} | DURATION: ${ele.duration !== undefined ? ele.duration : '-'}\n`;
+          }
+          item.integrates = Itemp;
+
+          // Process caution data
+          let cSpeed = '';
+          let cLength = '';
+          let cTdc = '';
+          let cTimeLoss ='';
+          for (let ele of item.caution) {
+            cLength += `${ele.length}\n`;
+            cSpeed += `${ele.speed}\n`;
+            cTdc += `${ele.tdc}\n`;
+            cTimeLoss +=ele.timeloss? `${ ele.timeloss} \n`:''; 
+          }
+          item.cautionLength = cLength;
+          item.cautionSpeed = cSpeed;
+          item.cautionTdc = cTdc;
+          item.cautionTimeLoss= cTimeLoss;
+          return item;
+        });
+    
+        // Update dataset and Handsontable
+        this.dataSet.push(...data);
+        
+      });
+    });
+  }
+  console.log('data---',this.dataSet)
+
+}
+
+selectStartDate(e) {
+  this.startDate = DateTime.fromISO(e.target.value);
+}
+selectEndDate(e) {
+  this.endDate = DateTime.fromISO(e.target.value);
+}
+
+filterDataWithDate() {
+  if (!this.startDate && !this.endDate) {
+    return;
+  }
+
+  if (!Array.isArray(this.dataSet)) {
+    console.error("Dataset is not an array.");
+    return;
+  }
+
+  const data = this.dataSet.filter((item) => {
+    // Ensure the 'date' property exists and is valid
+    if (!item.date || typeof item.date !== 'string') {
+      return false;
+    }
+
+    const parsedDate = DateTime.fromFormat(item.date, 'dd/MM/yyyy');
+
+    // Check if the parsedDate falls within the selected date range
+    if (
+      (this.startDate === undefined || this.startDate <= parsedDate) &&
+      (this.endDate === undefined || this.endDate >= parsedDate)
+    ) {
+      return true;
+    }
+
+    return false;
+  });
+
+  // Update the dataset with filtered data
+  this.filteredData = data;
+}
 
   onSelectBoard(e) {
     this.board = e.target.value;
     this.sectionList = [];
+    this.selectedBoard =e.target.value;
 
     for (let item of this.dataSet) {
       if (item.board === this.board) {
@@ -633,4 +906,11 @@ export class AddDetailsComponent implements OnInit {
     ];
     this.sectionSelected = {};
   }
+}
+function generateReportLogic(selectedColumns: string[]): any {
+  throw new Error('Function not implemented.');
+}
+
+function downloadPDF() {
+  throw new Error('Function not implemented.');
 }

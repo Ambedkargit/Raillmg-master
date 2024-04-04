@@ -41,6 +41,7 @@ export class MachineRollComponent implements OnInit {
     editor: false,
     readOnly: true,
     ...hotSettings,
+    height: '74vh',
   };
  
   constructor(
