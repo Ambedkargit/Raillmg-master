@@ -40,39 +40,48 @@ generatedReport :any;
   dataset: any;
   filteredData: any[];
   selectedBoard: any;
+  selectedDepartment: any;
+  departmentList: any;
 
 generateReport() {
   console.log('Generating report with columns:', this.selectedColumns);
   console.log('DataSet:', this.dataSet);
   this.generatedReport = this.generateReportLogic(this.selectedColumns);
 }
-generateReportLogic(selectedColumns: string[]): any {
+generateReportLogic(selectedColumns: string[], selectedDepartment?: string): any {
+  // if (!this.selectedDepartment) {
+  //   console.error('Selected department is not defined!');
+  //   return;
+  // }
+
   if (!this.dataSet || this.dataSet.length === 0) {
     console.error('Dataset is empty or undefined!');
-    return null; // Return null or handle error appropriately
+    return; // Return or handle error appropriately
   }
 
-  // Filter the dataset based on the selected date range
+  // Filter the dataset based on the selected date range and board
   const filteredData = this.dataSet.filter(item => {
-    // Ensure the 'date' property exists and is valid
-    if (!item.date || typeof item.date !== 'string'||
-    !item.board || typeof item.board !== 'string') {
+    // Ensure the 'date', 'board', and 'department' properties exist and are valid
+    if (!item.date || typeof item.date !== 'string' ||
+        !item.board || typeof item.board !== 'string' ||
+        !item.department || typeof item.department !== 'string') {
       return false;
     }
 
     const parsedDate = DateTime.fromFormat(item.date, 'dd/MM/yyyy');
 
-    // Check if the parsedDate falls within the selected date range
+    // Check if the parsedDate falls within the selected date range, board, and department
     if (
       (this.startDate === undefined || this.startDate <= parsedDate) &&
-      (this.endDate === undefined || this.endDate >= parsedDate)
-      &&
-      (this.selectedBoard === undefined || this.selectedBoard === item.board)
+      (this.endDate === undefined || this.endDate >= parsedDate) &&
+      (this.selectedBoard === undefined || this.selectedBoard === item.board) &&
+      (this.selectedDepartment ===undefined || this.selectedDepartment === item.department)
     ) {
       return true;
     }
 
     return false;
+  
   }).map(item => {
     // Create a filtered item object with selected columns
     const filteredItem: any = {};
@@ -80,12 +89,11 @@ generateReportLogic(selectedColumns: string[]): any {
       // Check if column exists in item before accessing it
       if (item.hasOwnProperty(column)) {
         filteredItem[column] = item[column];
-      } else {
-        console.warn(`Column "${column}" not found in dataset row!`);
       }
     });
     return filteredItem;
   });
+
   filteredData.sort((a, b) => {
     const dateA = DateTime.fromFormat(a.date, 'dd/MM/yyyy');
     const dateB = DateTime.fromFormat(b.date, 'dd/MM/yyyy');
@@ -97,6 +105,8 @@ generateReportLogic(selectedColumns: string[]): any {
     selectedColumns: selectedColumns,
     reportData: filteredData
   };
+
+  console.log("Selected Department:", selectedDepartment); // Log selected department for debugging
 
   return report;
 }
@@ -408,6 +418,20 @@ filterDataWithDate() {
       }
     }
     this.onSelectSection(this.sectionList[0]);
+  }
+
+  onSelectDepartment(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    // Update the selected department
+    this.selectedDepartment = target.value;
+    console.log("Selected department:", this.selectedDepartment);
+    if (this.selectedDepartment === "") {
+      // If "All Department" is selected, pass an empty string to generateReportLogic
+      this.generateReportLogic(this.selectedColumns);
+    } else {
+      // Otherwise, pass the selected department to generateReportLogic
+      this.generateReportLogic(this.selectedColumns, this.selectedDepartment);
+    }
   }
 
   onSelectSection(e) {

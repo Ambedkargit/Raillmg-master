@@ -408,7 +408,7 @@
           <button ngbNavLink (click)="onTabChange()">GENERATE REPORT</button>
           <ng-template ngbNavContent>
             <div class="row">
-              <div class="col-6">
+              <div class="col-9">
                 
                 <input id="typeahead-format" placeholder="ENTER REPORT NAME" #reportNameInput class="form-control mt-3 mb-3" type="text" name="add-report">
 
@@ -418,10 +418,22 @@
                   <option value="NON-ROLLING">NON-ROLLING</option>
                   <option value="ROLLING / NON-ROLLING">ALL ROLLING & NON-ROLLING</option>
                 </select>
-                <!-- <label>BOARD</label> -->
-                <select class="form-select mt-3 mb-3" (change)="onSelectBoard($event)">
+                 <!-- <label>BOARD</label> -->
+                 <select class="form-select mt-3 mb-3" (change)="onSelectBoard($event)">
                   <option value="" selected disabled>SELECT BOARD</option>
                   <option value="{{board}}" *ngFor="let board of boardList">{{board}}</option>
+                </select>
+                <select class="form-select mt-3 mb-3" (change)="onSelectDepartment($event)">
+                  <option value="" selected disabled>SELECT DEPARTMENT</option>
+                  <option value="CONSTRUCTION">CONSTRUCTION</option>
+                  <option value="ENGINEERING">ENGINEERING</option>
+                  <option value="SIGNAL">SIGNAL</option>
+                  <option value="TRD">TRD</option>
+                  <option value="IRCON-PKG2 (BPB)">IRCON-PKG2 (BPB)</option>
+                  <option value="IRCON-PKG6 (LMG-FKG)">IRCON-PKG6 (LMG-FKG)</option>
+                  <option value="RITES-(LMG-BPB)">RITES-(LMG-BPB)</option>
+                  <option value="RECON-(HJI-LMG & CPK-HJI)">RECON-(HJI-LMG & CPK-HJI)</option>
+                  <option value="{{department}}" *ngFor="let department of departmentList">{{department}}</option>
                 </select>
                 
                 <div class="row w-100">
@@ -464,8 +476,8 @@
               </div>
               
               </div>
-              <div class="col-6">
-                <label>COLUMNS</label>
+              <div class="col-3">
+                <label><b>COLUMNS</b></label>
                 <div class="form-check" *ngFor="let column of columns">
                   <input class="form-check-input" type="checkbox" [id]="column.title" [value]="column.data" (change)="onColumnSelectionChange(column.data)">
                   <label class="form-check-label" [for]="column.data">{{ column.data }}</label>
