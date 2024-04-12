@@ -118,6 +118,69 @@ onColumnSelectionChange(columnTitle: string) {
     this.selectedColumns.splice(index, 1);
   }
 }
+downloadPDF() {
+  const reportData = this.generateReportLogic(this.selectedColumns);
+
+  if (!reportData || reportData.reportData.length === 0) {
+    console.error('No data available for download');
+    return;
+  }
+
+  // Define the gap size between columns
+  const columnGap = 25; // Adjust as needed
+
+  // Convert report data to HTML table
+  const tableHtml = '<table style="width:100%">' + // Set the table width to 100%
+    '<thead>' +
+    '<tr>' +
+    reportData.selectedColumns.map(column => `<th>${column.toUpperCase()}</th>`).join('') +
+    '</tr>' +
+    '</thead>' +
+    '<tbody>' +
+    reportData.reportData.map(row =>
+      '<tr>' +
+      reportData.selectedColumns.map(column => {
+        const value = row[column];
+        return `<td style="padding: 25px;">${value !== null ? value : ''}</td>`; // Apply padding to create gap
+      }).join('') +
+      '</tr>'
+    ).join('') +
+    '</tbody>' +
+    '</table>';
+
+   // Load the JPG image
+   const img = new Image();
+   img.src = '/assets/cover_page.jpg'; // Replace 'path/to/your/image.jpg' with the actual path to your JPG file
+   img.onload = function() {
+     const canvas = document.createElement('canvas');
+     canvas.width = img.width;
+     canvas.height = img.height;
+     const ctx = canvas.getContext('2d');
+     ctx.drawImage(img, 0, 0);
+ 
+     // Create a new jsPDF instance
+     const pdf = new jsPDF();
+ 
+     // Add JPG image to PDF
+     pdf.addImage(canvas.toDataURL('image/jpeg'), 'JPEG', 15, 10, img.width * 0.15, img.height * 0.2); // Adjust scale as needed
+ 
+     // Add HTML table content to PDF
+     pdf.html(tableHtml, {
+       callback: pdf => {
+         // Trigger download
+         const fileName = (document.getElementById('typeahead-format') as HTMLInputElement).value.trim() || 'generated_report';
+         pdf.save(`${fileName}.pdf`);
+       },
+       x: 10,
+       y: img.height * 0.25 + 50, // Adjust the Y position to leave space below the image
+       margin: [5,10,10,10],
+       html2canvas: {
+         scale: 0.11 // Adjust scale as needed
+       }
+     });
+   };
+ }
+
 
 // downloadPDF() {
 //   const element = document.getElementById('report-preview');
@@ -137,20 +200,29 @@ onColumnSelectionChange(columnTitle: string) {
 //     width: document.documentElement.scrollWidth, 
 //     height: document.documentElement.scrollHeight 
 //   }).then((canvas) => {
-//     const imgData = canvas.toDataURL('image/png');
 //     const pdf = new jsPDF();
-//     const imgWidth = 210;
-//     const imgHeight = (canvas.height * imgWidth) / canvas.width;
+//     // Add the image file to the PDF
+//     const img = new Image();
+//     img.src = '/assets/cover_page.jpg'; // Replace with the actual path to your image
+//     img.onload = function () {
+//       const imgWidth = 210; // Adjust as needed
+//       const imgHeight = (img.height * imgWidth) / img.width;
+//       pdf.addImage(img, 'JPEG', 0, 0, imgWidth, imgHeight);
 
-//     pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+//        // Add the canvas content to the PDF
+//       const imgData = canvas.toDataURL('image/png');
+//       const canvasImgWidth =260; // Adjust as needed
+//       const canvasImgHeight = (canvas.height * canvasImgWidth) / canvas.width;
+//       pdf.addImage(imgData, 'PNG', 5, imgHeight + 10, canvasImgWidth, canvasImgHeight);
 
 //     // Reset overflow style
 //     element.style.overflow = originalStyle;
 
 //     // Download PDF with the name from the input field
 //     const fileName = reportNameInput.value.trim() || 'generated_report';
-//     pdf.save(${fileName}.pdf);
-//   });
+//     pdf.save(`${fileName}.pdf`);
+//   };
+// });
 // }
 
 downloadExcel() {
