@@ -48,7 +48,7 @@ export class MachineRollComponent implements OnInit {
     private service: AppService,
     private toastService: ToastService,
     private route: ActivatedRoute,
-    private connect: ConnectService //add extra service
+    //private connectservice: ConnectService //add extra service
   ) {}
 
   ngOnInit() {
@@ -104,6 +104,7 @@ export class MachineRollComponent implements OnInit {
           });
              this.dataset.push(...data);
             hot.updateData(this.dataset);
+           // this.connectservice.setTimelossData(data.map(item => item.cautionTimeLoss));
           });
         });
         
@@ -150,14 +151,32 @@ export class MachineRollComponent implements OnInit {
       return ele;
     });
 
+    
+    const img = new Image();
+    img.src = '/assets/cover_page.jpg'; // Replace 'path_to_your_image.jpg' with the actual path to your JPG image
     const doc = new jsPDF('p', 'pc', [300, 500]);
+    img.onload = function () {
+        // Calculate the aspect ratio to maintain the image's proportions
+        const aspectRatio = img.width / img.height;
+
+        // Calculate the width and height of the image on the PDF
+        const imgWidth = 300; // Adjust as needed
+        const imgHeight = imgWidth / aspectRatio;
+
+        // Add the image to the PDF
+        doc.addImage(img, 'JPEG', 10, 10, imgWidth, imgHeight);
+
     // autoTable(doc, { html: '#table-wrapper' });
     autoTable(doc, {
+      startY: imgHeight + 20, 
       head: [dataSet.shift()],
       body: dataSet,
     });
-     doc.save('raillmg.pdf');
-  
+     // Load the JPG image
+     
+         // Save the PDF
+         doc.save('merged_document.pdf');
+     };
    }
 
   //getting pdf on sign component
