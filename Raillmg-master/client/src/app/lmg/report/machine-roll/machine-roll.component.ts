@@ -97,9 +97,9 @@ export class MachineRollComponent implements OnInit {
 
               return item;
             });
-        
+            this.dataset.push(...data);
            
-          // Sort dataset based on date in ascending order
+          //Sort dataset based on date in ascending order
           this.dataset.sort((a, b) => {
             return new Date(a.date).getTime() - new Date(b.date).getTime();
           });
@@ -121,7 +121,7 @@ export class MachineRollComponent implements OnInit {
           // Push total row to the end of data array
           data.push(totalRow);
 
-          // Update Handsontable with the updated data
+         // Update Handsontable with the updated data
           hot.updateData(data);
 
 
@@ -253,7 +253,7 @@ export class MachineRollComponent implements OnInit {
 
     const hot = this.hotRegisterer.getInstance(this.id);
 
-    const data = this.dataset.filter((item) => {
+    const filteredData = this.dataset.filter((item) => {
       const parsedDate = DateTime.fromFormat(item.date, 'dd/MM/yyyy');
 
       if (this.startDate <= parsedDate && this.endDate >= parsedDate) {
@@ -276,13 +276,35 @@ export class MachineRollComponent implements OnInit {
     });
     
     // Sort the filtered data by date in ascending order
-    data.sort((a, b) => {
+    filteredData.sort((a, b) => {
       const dateA = DateTime.fromFormat(a.date, 'dd/MM/yyyy');
       const dateB = DateTime.fromFormat(b.date, 'dd/MM/yyyy');
       return dateA.toMillis() - dateB.toMillis();
     });
-    hot.updateData(data);
-  }
+    hot.updateData(filteredData);
+
+    // Calculate total sum of time_granted and dmd_duration
+    let total_time_granted = 0;
+    let total_dmd_duration = 0;
+    for (let item of filteredData) {
+      total_time_granted += item.time_granted || 0;
+      total_dmd_duration += item.dmd_duration || 0;
+    }
+
+    // Create total row object
+    const totalRow = {
+      time_granted: total_time_granted,
+      dmd_duration: total_dmd_duration,
+      // Add other properties if needed
+    };
+
+    // Push total row to the end of filtered data array
+    filteredData.push(totalRow);
+
+    // Update Handsontable with the updated data including the total row
+    hot.updateData(filteredData);
+}
+
 
   ResetDates() {
     const hot = this.hotRegisterer.getInstance(this.id);
