@@ -13,6 +13,7 @@ import { DateTime } from 'luxon';
 import autoTable from 'jspdf-autotable';
 import jsPDF from 'jspdf';
 import { ConnectService } from '../../../services/connect.service';
+import {sectionDetails } from  '../../../shared/constants/sectionDetails';
 
 registerAllModules();
 @Component({
@@ -48,7 +49,7 @@ export class MachineRollComponent implements OnInit {
     private service: AppService,
     private toastService: ToastService,
     private route: ActivatedRoute,
-    //private connectservice: ConnectService //add extra service
+    private connectService: ConnectService //add extra service
   ) {}
 
   ngOnInit() {
@@ -102,10 +103,37 @@ export class MachineRollComponent implements OnInit {
           this.dataset.sort((a, b) => {
             return new Date(a.date).getTime() - new Date(b.date).getTime();
           });
-             this.dataset.push(...data);
-            hot.updateData(this.dataset);
-           // this.connectservice.setTimelossData(data.map(item => item.cautionTimeLoss));
-          });
+               // Calculate total sum of time_granted and dmd_duration
+          let total_time_granted = 0;
+          let total_dmd_duration = 0;
+          for (let item of data) {
+            total_time_granted += item.time_granted || 0;
+            total_dmd_duration += item.dmd_duration || 0;
+          }
+
+          // Create total row object
+          const totalRow = {
+            time_granted: total_time_granted,
+            dmd_duration: total_dmd_duration,
+            // Add other properties if needed
+          };
+
+          // Push total row to the end of data array
+          data.push(totalRow);
+
+          // Update Handsontable with the updated data
+          hot.updateData(data);
+
+
+            //  // Fetch and set timeloss data for subsections
+            //  for (let item of data) {
+            //   for (let caution of item.caution) {
+            //     const section = item.section; // Assuming 'section' is the key for section
+            //     const timeloss = caution.timeloss || 0; // Assuming 'timeloss' is the key for timeloss
+            //     this.connectService.setTimelossData(section, timeloss);
+            //   }
+            // }
+          }); 
         });
         
       }

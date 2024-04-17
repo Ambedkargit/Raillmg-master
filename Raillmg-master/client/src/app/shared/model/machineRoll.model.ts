@@ -36,7 +36,10 @@ export interface IMachineRoll {
   updatedAt: string;
   logs: ILog[];
   series: string;
-  time_granted: string;
+  block_start: string;
+  block_end: string;
+  time_granted: number;
+  time_burst: number;
   burst: string;
   caution: [];
   cancelTrain: string;
@@ -48,6 +51,10 @@ export interface IMachineRoll {
   output: string;
   OPTG_remarks: string;
   mps: number;
+  sec: string;
+  len: number;
+  subsec: string[];
+  a: number;
 }
 
 export interface ILog {

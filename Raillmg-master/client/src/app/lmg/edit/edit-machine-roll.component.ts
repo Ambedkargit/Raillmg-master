@@ -65,6 +65,33 @@ export class EditMachineRollComponent {
               return;
             }
           }
+
+          if (headerKey === 'block_start' || headerKey === 'block_end') {
+            const startTime = hot.getDataAtRowProp(row, 'block_start');
+            const endTime = hot.getDataAtRowProp(row, 'block_end');
+    
+            // Ensure both startTime and endTime are not null or undefined
+            if (startTime && endTime) {
+              // Parse startTime and endTime strings into hours and minutes
+              const startParts = startTime.split(':').map(Number);
+              const endParts = endTime.split(':').map(Number);
+    
+             
+              // Calculate time difference in minutes
+              const startTimeMs = startParts[0] * 60 + startParts[1];
+              let endTimeMs = endParts[0] * 60 + endParts[1];
+              if(endTimeMs < startTimeMs){
+                 endTimeMs += 24 * 60;
+              }
+              const timeDiffMinutes = endTimeMs - startTimeMs;
+
+              // Update 'time_granted' and 'time_burst' based on time difference in minutes
+              const timeDiffMinutesNum = Number(timeDiffMinutes); // Convert to number
+              hot.setDataAtRowProp(row, 'time_granted', timeDiffMinutes);
+              const avlDuration = hot.getDataAtRowProp(row, 'avl_duration') || 0;
+              hot.setDataAtRowProp(row, 'time_burst', timeDiffMinutes - avlDuration);
+            }
+          }
           let data = this.dataSet.find((item) => item._id === id);
           if (!data.logs.length) data.logs = [];
 

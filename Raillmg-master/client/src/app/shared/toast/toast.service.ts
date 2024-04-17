@@ -32,7 +32,7 @@ export class ToastService {
     }
 
     showWarning(template: String) {
-        this.toasts.push({ template, classname: 'bg-warning text-success', delay: 5000 });
+        this.toasts.push({ template, classname: 'bg-warning text-success', delay: 10000 });
     }
 
 

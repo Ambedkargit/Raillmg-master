@@ -128,28 +128,6 @@ export class AddMachineConstComponent implements OnInit {
   }
  
 
-  // onTpcStaffChange(event, staffType) {
-  //   if (event.target.checked) {
-  //     if (staffType === 'TPC Staff') {
-  //       this.department.value.tpcStaff = true;
-  //       this.department.value.staff.push('TRD');
-  //       this.toastr.warning('TPC Staff is required for this block.', 'Alert');
-  //     } else if (staffType === 'S&T Staff') {
-  //       this.department.value.sttStaff = true;
-  //       this.department.value.staff.push('S&T');
-  //       this.toastr.warning('S&T Staff is required for this block.', 'Alert');
-  //     }
-  //   } else {
-  //     if (staffType === 'TPC Staff') {
-  //       this.department.value.tpcStaff = false;
-  //       this.department.value.staff = this.department.value.staff.filter(staff => staff !== 'TPC Staff');
-  //     } else if (staffType === 'S&T Staff') {
-  //       this.department.value.sttStaff = false;
-  //       this.department.value.staff = this.department.value.staff.filter(staff => staff !== 'S&T Staff');
-  //     }
-  //   }
-  // }
-
   ngOnInit(): void {
     console.log(this.domain);
 
@@ -216,108 +194,133 @@ export class AddMachineConstComponent implements OnInit {
 
   onSubmit() {
     if (this.machineFormArray.value.length === 0 || !this.form.valid) {
-      this.toastService.showWarning('Please fill all details');
-      return;
+        this.toastService.showWarning('Please fill all details');
+        return;
     }
-    //  add for Alert at tpc staff required
-    
-    const userDepartment = this.authGuard.getUserDepartment();
- 
-    const hasTPCStaff = this.machineFormArray.value.some(item => item.tpcStaff === "Yes");
-    const hasS_TStaff = this.machineFormArray.value.some(item => item.s_tStaff === "Yes");
-    
-    if (hasTPCStaff || hasS_TStaff) {
-        sessionStorage.setItem('showAlert', 'true');
+    const currentTime = DateTime.now();
+    const submissionTimeLimit = currentTime.set({ hour: 15, minute: 0, second: 0, millisecond: 0 });
+
+   // const previousDomain = this.domain;
+
+    for (let item of this.machineFormArray.value) {
+        let avlSlotList;
+        if (item.avlSlotOtherCheckBox) {
+            avlSlotList = item.avlSlotOther;
+        } else {
+            avlSlotList = item.availableSlot;
+        }
+
+        for (let slotItem of avlSlotList) {
+            let splitSlot = slotItem.split(' ');
+            const slotDate = DateTime.fromFormat(splitSlot[0], 'dd/MM/yyyy');
+
+             // Check if the slot date is today and type of machinerolls or mainenancerolls
+            if ((this.domain === 'machineRolls' || this.domain === 'maintenanceRolls') &&
+             (slotDate.equals(currentTime.startOf('day')))) {
+              this.toastService.showWarning('Submission for today\'s Rolling demand is not allowed. It will save as Non-Rolling demand. If you want, click on SUBMIT again');
+              if (this.domain === 'machineRolls') {
+                this.domain = 'machineNonRolls';
+            } else if (this.domain === 'maintenanceRolls') {
+                this.domain = 'maintenanceNonRolls';
+            }
+              return;
+              }
+            
+            // Check if the slot date is tomorrow and if the current time is past 15:00 hrs of today
+            if ((slotDate.equals(currentTime.plus({ days: 1 }).startOf('day'))) && (this.domain === 'machineRolls' || this.domain === 'maintenanceRolls') &&
+                currentTime >= submissionTimeLimit) {
+                this.toastService.showWarning('Submission after 15:00 hrs for tomorrow\'s demand is not allowed. It will save in Non-Rolling demand. If you want, click on SUBMIT again');
+                if (this.domain === 'machineRolls') {
+                  this.domain = 'machineNonRolls';
+              } else if (this.domain === 'maintenanceRolls') {
+                  this.domain = 'maintenanceNonRolls';
+              }
+                return;
+               
+            }
+         }
+
     }
     
-     
-    
+
+    // // Check if TRD or S&T Staff is selected as Yes
+    // const hasTPCStaff = this.machineFormArray.value.some(item => item.tpcStaff === "Yes");
+    // const hasS_TStaff = this.machineFormArray.value.some(item => item.s_tStaff === "Yes");
+
+    // // Set showAlert flag in sessionStorage if TRD or S&T Staff is selected as Yes
+    // if (hasTPCStaff || hasS_TStaff) {
+    //     sessionStorage.setItem('showAlert', 'true');
+    // }else {
+    //     sessionStorage.removeItem('showAlert');
+    // }
+
+
     let payload = [];
 
     for (let [index, item] of this.machineFormArray.value.entries()) {
-      let avlSlotList;
-      if (item.avlSlotOtherCheckBox) {
-        avlSlotList = item.avlSlotOther;
-      } else {
-        avlSlotList = item.availableSlot;
-      }
-
-      for (let slotItem of avlSlotList) {
-        let splitSlot = [];
-        // if (item.availableSlot) {
-        //   // const regexPattern = new RegExp(
-        //   //   '\\b([0-3][0-9]/[0-1][1-2]/\\d{4}) ([0-2][0-9]:[0-2][0-9]) to ([0-2][0-9]:[0-2][0-9]) (\\b(?:MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)\\b)\\b'
-        //   // );
-        //   // if (!regexPattern.test(item.avlSlotOther)) {
-        //   //   this.toastService.showDanger('AVAILABLE SLOT ARE INCORRECT FORMAT');
-        //   //   return;
-        //   // }
-
-        //   splitSlot = slotItem.split(' ');
-        // } else {
-        //   splitSlot = item.availableSlot.split(' ');
-        // }
-        splitSlot = slotItem.split(' ');
-
-        if (!item.crewCheckbox || item.crew == null) {
-          item.crew = 0;
+        let avlSlotList;
+        if (item.avlSlotOtherCheckBox) {
+            avlSlotList = item.avlSlotOther;
+        } else {
+            avlSlotList = item.availableSlot;
         }
-        if (!item.locoCheckbox || item.loco == null) {
-          item.loco = 0;
-        }
-        item.caution = this.cautions[index];
-        item.integrated = this.integrates[index];
 
-        const dt = DateTime.now();
-        const startTime = DateTime.fromFormat(splitSlot[1], 'HH:mm');
-        let endTime = DateTime.fromFormat(splitSlot[3], 'HH:mm');
-        
-        // Adjust endTime if it's less than startTime
-        if (endTime < startTime) {
-          endTime = endTime.plus({days: 1}); // Adding 1 day (24 hours)
+        for (let slotItem of avlSlotList) {
+            let splitSlot = slotItem.split(' ');
+
+            if (!item.crewCheckbox || item.crew == null) {
+                item.crew = 0;
+            }
+            if (!item.locoCheckbox || item.loco == null) {
+                item.loco = 0;
+            }
+            item.caution = this.cautions[index];
+            item.integrated = this.integrates[index];
+
+            const startTime = DateTime.fromFormat(splitSlot[1], 'HH:mm');
+            let endTime = DateTime.fromFormat(splitSlot[3], 'HH:mm');
+
+            // Adjust endTime if it's less than startTime
+            if (endTime < startTime) {
+                endTime = endTime.plus({ days: 1 }); // Adding 1 day (24 hours)
+            }
+
+            const timeDifferenceInMinutes = endTime.diff(startTime, 'minutes').minutes;
+
+            payload.push({
+                ...item,
+                avl_start: splitSlot[1],
+                avl_end: splitSlot[3],
+                date: splitSlot[0],
+                department: this.department.value,
+                avl_duration: timeDifferenceInMinutes,
+                createdAt: new Date().toISOString(),
+                createdBy: this.userData.username,
+                updatedAt: new Date().toISOString(),
+                updatedBy: this.userData.username,
+                logs: [],
+            });
         }
-        
-        const timeDifferenceInMinutes = endTime.diff(startTime,'minutes').minutes;
-        
-        // item.machine = item.machine.map((item) => {
-        //   return item.machine.trim();
-        // });
-  
-        payload.push({
-          ...item,
-          avl_start: splitSlot[1],
-          avl_end: splitSlot[3],
-          date: splitSlot[0],
-          department: this.department.value,
-          avl_duration: timeDifferenceInMinutes, 
-          createdAt: new Date().toISOString(),
-          createdBy: this.userData.username,
-          updatedAt: new Date().toISOString(),
-          updatedBy: this.userData.username,
-    
-          logs: [],
-        });
-      }
     }
     payload.sort((a, b) => {
-      const dateA = DateTime.fromFormat(a.date, 'dd/MM/yyyy');
-      const dateB = DateTime.fromFormat(b.date, 'dd/MM/yyyy');
-      return dateA.toMillis() - dateB.toMillis();
-  });
-  
-    // console.log('🚀 ~ payload:', payload);
-    // return;
-    this.service.addRailDetails(this.domain, payload).subscribe((res) => {
-      for (let index = this.machineFormArray.length - 1; index >= 0; index--) {
-        this.machineFormArray.removeAt(index);
-      }
-      if (this.userData.department === 'OPERATING') {
-        this.form.get('department')?.enable();
-      }
-      this.toastService.showSuccess('successfully submitted');
+        const dateA = DateTime.fromFormat(a.date, 'dd/MM/yyyy');
+        const dateB = DateTime.fromFormat(b.date, 'dd/MM/yyyy');
+        return dateA.toMillis() - dateB.toMillis();
     });
-  }
- 
+
+    this.service.addRailDetails(this.domain, payload).subscribe((res) => {
+        for (let index = this.machineFormArray.length - 1; index >= 0; index--) {
+            this.machineFormArray.removeAt(index);
+        }
+        if (this.userData.department === 'OPERATING') {
+            this.form.get('department')?.enable();
+        }
+        this.toastService.showSuccess('Successfully submitted');
+    });
+    // this.domain = previousDomain;
+    // window.location.reload();
+}
+
 
   onAddNewForm() {
     this.form.get('department')?.disable();
@@ -513,19 +516,40 @@ export class AddMachineConstComponent implements OnInit {
   }
   addSlot() {
     if (!this.slot.date || !this.slot.startTime || !this.slot.endTime) {
-      this.toastService.showDanger('fill all details');
-      return;
+        this.toastService.showDanger('Please fill in all details.');
+        return;
     }
+    
     const parsedDate = DateTime.fromISO(this.slot.date);
     const formattedDate = parsedDate.toFormat('dd/MM/yyyy');
-    let text = `${formattedDate} ${this.slot.startTime.hour}:${this.slot.startTime.minute} to ${this.slot.endTime.hour}:${this.slot.endTime.minute} hrs`;
+    
+    // Calculate slot duration
+    const startHour = this.slot.startTime.hour;
+    const startMinute = this.slot.startTime.minute;
+    const endHour = this.slot.endTime.hour;
+    const endMinute = this.slot.endTime.minute;
+    const durationInMinutes = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
+  
+    // Construct slot text with start and end time
+    const startTimeText = `${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
+    const endTimeText = `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
+    const text = `${formattedDate} ${startTimeText} to ${endTimeText} hrs (Duration: ${durationInMinutes} minutes)`;
+    
+    // Push the text to the avlSlotOther array
     this.machineFormArray.value[this.slotIndex].avlSlotOther.push(text);
+    
+    // Update avl_duration column
+    const row = this.machineFormArray.at(this.slotIndex);
+    const avlDuration = row.get('avl_duration').value || 0;
+    row.get('avl_duration').setValue(avlDuration + durationInMinutes);
+  
+    // Reset slot values
     this.slot = {
-      date: '',
-      startTime: '',
-      endTime: '',
+        date: '',
+        startTime: { hour: 0, minute: 0 },
+        endTime: { hour: 0, minute: 0 },
     };
-  }
+}  
   deleteSlot(formIndex, slotIndex) {
     this.machineFormArray.value[this.slotIndex].avlSlotOther.splice(
       slotIndex,

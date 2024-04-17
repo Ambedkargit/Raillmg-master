@@ -95,7 +95,10 @@ export class VerifyDemandTableComponent implements OnInit {
     { data: 'lineNo', title: 'LINE', width: 60 },
     { data: 'typeOfWork', title: 'TYPE OF WORK', width: 120 },
     { data: 'machine', title: 'MACHINE TYPE', width: 120 },
+    { data: 'block_start', title: 'BLOCK START', width: 120 },
+    { data: 'block_end', title: 'BLOCK END', width: 100 },
     { data: 'time_granted', title: 'TIME GRANTED', width: 120 },
+    { data: 'time_burst', title: 'BURST TIME', width: 100 },
     { data: 'output', title: 'OUTPUT', width: 120 },
     { data: 'quantum', title: 'QUANTUM', width: 120 },
     { data: 'series', title: 'SERIES', width: 80 },
@@ -212,8 +215,36 @@ export class VerifyDemandTableComponent implements OnInit {
           newValue = '';
         }
         const hot = this.hotRegisterer.getInstance(this.id);
+       
+        if (headerKey === 'block_start' || headerKey === 'block_end') {
+          const startTime = hot.getDataAtRowProp(row, 'block_start');
+          const endTime = hot.getDataAtRowProp(row, 'block_end');
+  
+          // Ensure both startTime and endTime are not null or undefined
+          if (startTime && endTime) {
+            // Parse startTime and endTime strings into hours and minutes
+            const startParts = startTime.split(':').map(Number);
+            const endParts = endTime.split(':').map(Number);
+  
+           
+            // Calculate time difference in minutes
+            const startTimeMs = startParts[0] * 60 + startParts[1];
+            let endTimeMs = endParts[0] * 60 + endParts[1];
+            if(endTimeMs < startTimeMs){
+               endTimeMs += 24 * 60;
+            }
+            const timeDiffMinutes = endTimeMs - startTimeMs;
+
+            // Update 'time_granted' and 'time_burst' based on time difference in minutes
+            const timeDiffMinutesNum = Number(timeDiffMinutes); // Convert to number
+            hot.setDataAtRowProp(row, 'time_granted', timeDiffMinutes);
+            const avlDuration = hot.getDataAtRowProp(row, 'avl_duration') || 0;
+            hot.setDataAtRowProp(row, 'time_burst', timeDiffMinutes - avlDuration);
+          }
+        }
+
         let id = hot.getDataAtRow(row)[0];
-        const url = hot.getDataAtRow(row)[37];
+        const url = hot.getDataAtRow(row)[40];
         console.log(hot.getDataAtRow(row));
         if (oldValue == newValue || (newValue == '' && oldValue == undefined)) {
           return;
@@ -260,6 +291,9 @@ export class VerifyDemandTableComponent implements OnInit {
       if (
         (prop === 'grant_status' ||
           prop === 'time_granted' ||
+          prop === 'time_burst' ||
+          prop === 'time_start' ||
+          prop === 'time_end' ||
           prop === 'remarks' ||
           prop === 'status' ||
           prop === 'burst' ||
@@ -300,7 +334,7 @@ export class VerifyDemandTableComponent implements OnInit {
       fetchUrl = ['machineNonRolls', 'maintenanceNonRolls'];
     }
     const currentDate = DateTime.now().toFormat('dd/MM/yyyy'); //show current date data
-    const nextDate = DateTime.now().plus({ days: 1 }).toFormat('dd/MM/yyyy'); //show previous date data
+    const nextDate = DateTime.now().plus({ days: 1 }).toFormat('dd/MM/yyyy'); //show next date data
 
     Promise.resolve().then(() => {
       for (let url of fetchUrl) {

@@ -43,7 +43,10 @@ const machineRollSchema = new Schema({
     // tower: { type: String },
     burst: { type: String, default: 'Block Ended on Time' },
     grant_status: { type: String, default: 'Pending' },
-    time_granted: { type: String },
+    block_start: {type: String},
+    block_end: {type: String},
+    time_granted: { type: Number},
+    time_burst: {type: Number},
     status: { type: String },
     Avl_status: { type: Boolean, default: true },
     createdBy: { type: String },
@@ -60,6 +63,9 @@ const machineRollSchema = new Schema({
     output: { type: String },
     OPTG_remarks: { type: String },
     logs: { type: [LogSchema], default: [] },
+    sec: { type: String },
+    len: { type: Number },
+    a: { type: Number },
 }, {
     versionKey: false
 })
