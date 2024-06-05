@@ -95,6 +95,25 @@ export class MachineRollComponent implements OnInit {
               item.cautionTdc = cTdc;
               item.cautionTimeLoss = cTimeLoss;
 
+              // Update remaining purse
+            const purseString = item.purse;
+            let remainPurse = null;
+  
+            if (purseString && purseString.includes(':')) {
+              const purseValueString = purseString.split(':')[1].trim();
+              const purseValue = parseFloat(purseValueString);
+  
+              if (!isNaN(purseValue)) {
+                const timeGrantedValue = parseFloat(item.time_granted);
+  
+                if (!isNaN(timeGrantedValue)) {
+                  remainPurse = (purseValue * 60) - timeGrantedValue;
+                }
+              }
+            }
+  
+            item.remain_purse = remainPurse;
+
               return item;
             });
             this.dataset.push(...data);
@@ -103,36 +122,43 @@ export class MachineRollComponent implements OnInit {
           this.dataset.sort((a, b) => {
             return new Date(a.date).getTime() - new Date(b.date).getTime();
           });
-               // Calculate total sum of time_granted and dmd_duration
-          let total_time_granted = 0;
-          let total_dmd_duration = 0;
-          for (let item of data) {
-            total_time_granted += item.time_granted || 0;
-            total_dmd_duration += item.dmd_duration || 0;
-          }
+        //   function formatTime(minutes) {
+        //     const hours = Math.floor(minutes / 60);
+        //     const remainingMinutes = minutes % 60;
+        //     return `${hours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')}`;
+        // }
+        
+        // // Calculate total sum of time_granted and dmd_duration
+        // let total_time_granted = 0;
+        // let total_dmd_duration = 0;
+        // for (let item of data) {
+        //     total_time_granted += item.time_granted || 0;
+        //     total_dmd_duration += item.dmd_duration || 0;
+        // }
+        
+        // // Convert total time granted and total DMD duration to hh:mm format
+        // const total_time_granted_hhmm = formatTime(total_time_granted);
+        // const total_dmd_duration_hhmm = formatTime(total_dmd_duration);
+        
+        // // Create total row object
+        // const totalRow = {
+        //     time_granted: total_time_granted_hhmm,
+        //     dmd_duration: total_dmd_duration_hhmm,
+        //     // Add other properties if needed
+        // };
+        
 
-          // Create total row object
-          const totalRow = {
-            time_granted: total_time_granted,
-            dmd_duration: total_dmd_duration,
-            // Add other properties if needed
-          };
+        //   // Push total row to the end of data array
+        //   data.push(totalRow);
 
-          // Push total row to the end of data array
-          data.push(totalRow);
-
-         // Update Handsontable with the updated data
-          hot.updateData(data);
+         
 
 
-            //  // Fetch and set timeloss data for subsections
-            //  for (let item of data) {
-            //   for (let caution of item.caution) {
-            //     const section = item.section; // Assuming 'section' is the key for section
-            //     const timeloss = caution.timeloss || 0; // Assuming 'timeloss' is the key for timeloss
-            //     this.connectService.setTimelossData(section, timeloss);
-            //   }
-            // }
+           
+
+// Update Handsontable with the updated data
+hot.updateData(data);
+
           }); 
         });
         
@@ -283,23 +309,34 @@ export class MachineRollComponent implements OnInit {
     });
     hot.updateData(filteredData);
 
-    // Calculate total sum of time_granted and dmd_duration
-    let total_time_granted = 0;
-    let total_dmd_duration = 0;
-    for (let item of filteredData) {
-      total_time_granted += item.time_granted || 0;
-      total_dmd_duration += item.dmd_duration || 0;
-    }
+  //   function formatTime(minutes) {
+  //     const hours = Math.floor(minutes / 60);
+  //     const remainingMinutes = minutes % 60;
+  //     return `${hours.toString().padStart(2, '0')}:${remainingMinutes.toString().padStart(2, '0')}`;
+  // }
+  
+  // // Calculate total sum of time_granted and dmd_duration
+  // let total_time_granted = 0;
+  // let total_dmd_duration = 0;
+  // for (let item of filteredData) {
+  //     total_time_granted += item.time_granted || 0;
+  //     total_dmd_duration += item.dmd_duration || 0;
+  // }
+  
+  // // Convert total time granted and total DMD duration to hh:mm format
+  // const total_time_granted_hhmm = formatTime(total_time_granted);
+  // const total_dmd_duration_hhmm = formatTime(total_dmd_duration);
+  
+  // // Create total row object
+  // const totalRow = {
+  //     time_granted: total_time_granted_hhmm,
+  //     dmd_duration: total_dmd_duration_hhmm,
+  //     // Add other properties if needed
+  // };
+  
 
-    // Create total row object
-    const totalRow = {
-      time_granted: total_time_granted,
-      dmd_duration: total_dmd_duration,
-      // Add other properties if needed
-    };
-
-    // Push total row to the end of filtered data array
-    filteredData.push(totalRow);
+  //   // Push total row to the end of filtered data array
+  //   filteredData.push(totalRow);
 
     // Update Handsontable with the updated data including the total row
     hot.updateData(filteredData);

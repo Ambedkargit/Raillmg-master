@@ -241,38 +241,57 @@
                                     </div> -->
                                     <div class="col-sm-6 col-md-3">
                                         <div class="form-group mt-3 mb-3">
-                                            <label>MACHINE TYPE</label>
-                                            <!-- <select class="form-select" formControlName="machine">
-                                                <option value="" selected disabled>
-                                                    SELECT MACHINE
-                                                </option>
-                                                @for(type of machineType; track $index){
-                                                <option value="{{ type.machine}}">{{ type.machine }}</option>
-                                                }
-                                            </select> -->
-                                            <div class="dropdown">
-                                                <ng-multiselect-dropdown [placeholder]="'SELECT MACHINE'"
-                                                    [settings]="dropdownSettings" [data]="machineType"
-                                                    formControlName="machine">
-                                                </ng-multiselect-dropdown>
-                                            </div>
+                                          <label>MACHINE TYPE</label>
+                                          <div class="dropdown">
+                                            <ng-multiselect-dropdown
+                                              [placeholder]="'SELECT MACHINE'"
+                                              [settings]="dropdownSettings"
+                                              [data]="getMachineNames()"
+                                              (onSelect)="onMachineSelected($event)"
+                                              formControlName="machine">
+                                            </ng-multiselect-dropdown>
+                                          </div>
                                         </div>
-                                    </div>
+                                      </div>
+                                      
+                                      <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                          <label>PURSE</label>
+                                          <div class="dropdown">
+                                            <input id="purse" type="text" class="form-control" formControlName="purse" readonly>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    
                                     <div class="col-sm-6 col-md-3">
                                         <div class="form-group mt-3 mb-3">
                                             <label>SERIES</label>
                                             <input type="text" class="form-control" placeholder="ENTER SERIES"
-                                                formControlName="series" />
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-6 col-md-3">
-                                        <div class="form-group mt-3 mb-3">
-                                            <label>TYPE OF WORK</label>
-                                            <input type="text" class="form-control" placeholder="ENTER TYPE OF WORK"
-                                                formControlName="typeOfWork" />
+                                                formControlName="series" >
                                         </div>
                                     </div>
 
+                                    <div class="col-sm-6 col-md-3">
+                                        <div class="form-group mt-3 mb-3">
+                                            <label for="typeOfWork">TYPE OF WORK</label>
+                                            <select class="form-select" id="typeOfWork" formControlName="typeOfWork" (change)="onWorkTypeChange($event)">
+                                                <option value="" selected disabled>SELECT TYPE OF WORK</option>
+                                                <option *ngFor="let workType of workTypeList" [value]="workType">{{ workType }}</option>
+                                            </select>
+                                        </div>
+                                    
+                                    
+                                
+                                    
+                                        
+                                        <div class="form-group mt-3 mb-3" *ngIf="isOtherSelected">
+                                            <label for="othertypeofWork">SPECIFY OTHER WORK TYPE</label>
+                                            <input type="text" class="form-control" id="othertypeofWork" formControlName="othertypeofWork" placeholder="Enter work type">
+                                        </div>                                         
+                                    </div>  
+                                    
+                                    
+                                    
                                     <div class="col-sm-6 col-md-3">
                                         <div class="form-group mt-3 mb-3">
                                             <label>QUANTUM</label>
@@ -323,10 +342,10 @@
                                     ==="S&T"){ -->
                                     <div class="col-sm-6 col-md-3">
                                         <div class="form-group mt-3 mb-3">
-                                            <label>TRD STAFF </label>
+                                            <label>TRD STAFF REQUIRED</label>
                                             <select class="form-select" formControlName="tpcStaff">
                                                 <option value="" disabled selected>
-                                                    SELECT TRD STAFF
+                                                    SELECT YES/NO
                                                 </option>
                                                 <option value="Yes">Yes</option>
                                                 <option value="No">No</option>
@@ -339,10 +358,10 @@
 
                                     <div class="col-sm-6 col-md-3">
                                         <div class="form-group mt-3 mb-3">
-                                            <label>S&T STAFF</label>
+                                            <label>S&T STAFF REQUIRED</label>
                                             <select class="form-select" formControlName="s_tStaff" >
                                                 <option value="" selected disabled>
-                                                    SELECT S&T STAFF
+                                                    SELECT YES/NO
                                                 </option>
                                                 <option value="Yes">Yes</option>
                                                 <option value="No">No</option>
@@ -395,14 +414,15 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-sm-6 col-md-4">
+                                        <div class="col-sm-6 col-md-8">
                                             <div class="form-group mt-3 mb-3">
                                                 <input type="checkbox" formControlName="integratedCheckbox" />
                                                 <label>INTEGRATED BLOCK</label>
                                                 @if(machineFormArray.controls[i].get('integratedCheckbox').value){
                                                 <div class="row text-center">
-                                                    <div class="col-4">BLOCK</div>
+                                                    <div class="col-3">BLOCK</div>
                                                     <div class="col-3">SECTION</div>
+                                                    
                                                     <div class="col-3">DURATION</div>
                                                     <div class="col-2">
                                                         <button type="button" class="btn btn-outline-primary"
@@ -412,7 +432,7 @@
                                                 <div class="row text-center"
                                                     *ngFor="let integrated of integrates[i]; let $index = index"
                                                     [attr.data-index]="i">
-                                                    <div class="col-4 p-0 pe-1">
+                                                    <div class="col-3 p-0 pe-1">
                                                         <input type="text" class="form-control"
                                                             placeholder="ENTER BLOCK OF INTEGRATED" name="block"
                                                             (change)="integratedBlock($event,i,$index)" required />
@@ -455,7 +475,7 @@
                                         <div class="col-sm-6 col-md-2">
                                             <div class="form-group mt-3 mb-3">
                                                 <input type="checkbox" formControlName="locoCheckbox" />
-                                                <label>LOCO REQUIRED</label>
+                                                <label>No. Of Loco Required</label>
                                                 @if(machineFormArray.controls[i].get('locoCheckbox').value){
                                                 <input type="number" class="form-control" name="loco"
                                                     placeholder="ENTER NUMBER OF LOCO REQUIRED"
@@ -466,7 +486,7 @@
                                         <div class="col-sm-6 col-md-2">
                                             <div class="form-group mt-3 mb-3">
                                                 <input type="checkbox" formControlName="crewCheckbox" />
-                                                <label>CREW REQUIRED</label>
+                                                <label>No. Of Crew Required</label>
                                                 @if(machineFormArray.controls[i].get('crewCheckbox').value){
                                                 <input type="number" class="form-control"
                                                     placeholder="ENTER NUMBER OF CREW REQUIRED"

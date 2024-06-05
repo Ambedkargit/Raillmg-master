@@ -14,6 +14,7 @@ import html2canvas from 'html2canvas';
 import { DateTime } from 'luxon';
 import { HotTableModule, HotTableRegisterer } from '@handsontable/angular';
 import * as XLSX from 'xlsx';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-add-details',
@@ -31,17 +32,152 @@ import * as XLSX from 'xlsx';
 export class AddDetailsComponent implements OnInit {
   
 
-columns: any[] = columns; // Assign the columns array
-// dataSet: any[] = [];
-selectedColumns: string[] = [];
-generatedReport :any;
+  columns: any[] = columns; // Assign the columns array
+  dataSet: any[] = [];
+  selectedColumns: string[] = [];
+  generatedReport: any;
   startDate: any;
   endDate: any;
   dataset: any;
   filteredData: any[];
   selectedBoard: any;
-  selectedDepartment: any;
+  selectedDepartment: string;
   departmentList: any;
+  machineAndPurseList: { _id?: string, machine: { machine: string }, purse: string }[] = [];
+  selectedMachine: { machine: string } = null;
+  purse: string = '';
+  editMachineAndPurse: any;
+  machineList: any[] = [];
+  boardList: any[] = [];
+  boardDataset: any;
+
+  constructor(
+    private service: AppService,
+    private toastService: ToastService,
+    private router: Router,
+    private ls: localStorageService,
+    private http: HttpClient
+  ) {
+    let user = this.ls.getUser();
+    if (user.department !== 'OPERATING') this.router.navigate(['/lmg']);
+  }
+
+  ngOnInit() {
+    console.log('ngOnInit called');
+    this.loadInitialData();
+  }
+
+  loadInitialData() {
+    this.loadMachineAndPurseListFromDatabase();
+    this.service.getAllRailDetails('boards').subscribe((data) => {
+      this.boardDataset = data;
+      for (let item of data) {
+        this.boardList.push(item.board);
+      }
+    });
+    this.service.getAllRailDetails('railDetails').subscribe((data) => {
+      this.dataSet = data;
+    });
+    this.service.getAllRailDetails('machines').subscribe((data) => {
+      this.machineList = data;
+    });
+  }
+
+  onMachineSelected(): void {
+    console.log('Selected Machine:', this.selectedMachine);
+  }
+
+  addPurseForMachine(): void {
+    console.log('Selected Machine:', this.selectedMachine);
+    console.log('Purse:', this.purse);
+    if (this.selectedMachine && this.purse.trim()) {
+      const newItem = {
+        machine: this.selectedMachine,
+        purse: this.purse.trim()
+      };
+      const exists = this.machineAndPurseList.some(item =>
+        item.machine.machine === newItem.machine.machine && item.purse === newItem.purse
+      );
+      if (!exists) {
+        this.machineAndPurseList.push(newItem);
+        console.log('Updated machineAndPurseList:', this.machineAndPurseList);
+        this.purse = '';
+        this.selectedMachine = null;
+        this.saveMachineAndPurseListToDatabase();
+      } else {
+        console.log('Combination already exists. Not adding again.');
+      }
+    }
+  }
+
+  saveMachineAndPurseListToDatabase(): void {
+    const backendEndpoint = 'http://localhost:3000/api/machine-purse';
+    const data = this.machineAndPurseList.map(item => ({
+      machine: item.machine.machine,
+      purse: item.purse
+    }));
+    console.log('Sending data to backend:', data);
+    this.http.post(backendEndpoint, data)
+      .subscribe(
+        (response) => {
+          console.log('Data saved successfully:', response);
+          this.loadMachineAndPurseListFromDatabase();
+        },
+        (error) => {
+          if (error.status === 400 && error.error.message === 'Duplicate entry detected') {
+            console.error('Duplicate entry detected:', error.error);
+          } else {
+            console.error('Error saving data:', error);
+          }
+        }
+      );
+  }
+
+  loadMachineAndPurseListFromDatabase(): void {
+    const backendEndpoint = 'http://localhost:3000/api/machine-purse';
+    this.http.get<{ _id: string, machine: string, purse: string }[]>(backendEndpoint)
+      .subscribe(
+        (response) => {
+          this.machineAndPurseList = response.map(item => ({
+            _id: item._id,
+            machine: { machine: item.machine },
+            purse: item.purse
+          }));
+          console.log('Data loaded successfully:', this.machineAndPurseList);
+        },
+        (error) => {
+          console.error('Error loading data:', error);
+        }
+      );
+  }
+
+  editPurse(item: any): void {
+    const newPurse = prompt('Enter new purse value:', item.purse);
+    if (newPurse !== null && newPurse.trim() !== '') {
+      item.purse = newPurse.trim();
+      this.updateMachineAndPurse(item);
+    }
+  }
+
+  updateMachineAndPurse(item: any): void {
+    const backendEndpoint = `http://localhost:3000/api/machine-purse/${item._id}`;
+    this.http.put(backendEndpoint, { purse: item.purse })
+      .subscribe(
+        (response) => {
+          console.log('Data updated successfully:', response);
+        },
+        (error) => {
+          console.error('Error updating data:', error);
+        }
+      );
+  }
+
+  readonly standardReports = {
+    'reportType1': ['date', 'department', 'section','stationFrom','stationTo','typeOfWork','avl_start','avl_end','dmd_duration','time_granted','output','time_burst','OPTG_remarks','APL_remarks'],
+    'reportType2': ['date', 'department', 'section','stationFrom','stationTo','typeOfWork','avl_start','avl_end','dmd_duration','time_granted','output','time_burst','OPTG_remarks','APL_remarks'],
+    // Add more report types as needed
+  };
+  
 
 generateReport() {
   console.log('Generating report with columns:', this.selectedColumns);
@@ -118,6 +254,17 @@ onColumnSelectionChange(columnTitle: string) {
     this.selectedColumns.splice(index, 1);
   }
 }
+
+onReportTypeChange(event: Event) {
+  const reportTypeDropdown = event.target as HTMLSelectElement;
+  const selectedReportType = reportTypeDropdown.value;
+
+  if (selectedReportType && this.standardReports[selectedReportType]) {
+    this.selectedColumns = this.standardReports[selectedReportType];
+    this.generateReport();
+  }
+}
+
 downloadPDF() {
   const reportData = this.generateReportLogic(this.selectedColumns);
 
@@ -289,11 +436,11 @@ saveBlob(blob: Blob, fileName: string) {
   slot = '';
   sectionSelected: any = {};
   stationSelected: any = {};
-  boardList = [];
+  //boardList = [];
   sectionList = [];
-  machineList = [];
+  //machineList = [];
   selectIndex: number;
-  dataSet: any[] = [];
+//  dataSet: any[] = [];
 
   directions = [
     {
@@ -352,92 +499,97 @@ saveBlob(blob: Blob, fileName: string) {
     'SATURDAY',
   ];
   
-  boardDataset = [];
-createReport: any;
-  constructor(
-    private service: AppService,
-    private toastService: ToastService,
-    private router: Router,
-    private ls: localStorageService
-  ) {
-    let user = this.ls.getUser();
-    if (user.department !== 'OPERATING') this.router.navigate(['/lmg']);
-  }
+  //boardDataset = [];
+  createReport: any;
+  username: string;
+  // constructor(
+  //   private service: AppService,
+  //   private toastService: ToastService,
+  //   private router: Router,
+  //   private ls: localStorageService
+  // ) {
+  //   let user = this.ls.getUser();
+  //   this.username = user.username;
+  //   if (user.department !== 'OPERATING') this.router.navigate(['/lmg']);
+  // }
 
-  ngOnInit() {
-    Promise.resolve().then(() => {
-      this.service.getAllRailDetails('boards').subscribe((data) => {
-        this.boardDataset = data;
-        for (let item of data) {
-          this.boardList.push(item.board);
-        }
-      });
-    });
-    Promise.resolve().then(() => {
-      this.service.getAllRailDetails('railDetails').subscribe((data) => {
-        this.dataSet = data;
-      });
-    });
-    Promise.resolve().then(() => {
-      this.service.getAllRailDetails('machines').subscribe((data) => {
-        this.machineList = data;
-      });
-    });
+  // ngOnInit() {
+  //   Promise.resolve().then(() => {
+  //     this.service.getAllRailDetails('boards').subscribe((data) => {
+  //       this.boardDataset = data;
+  //       for (let item of data) {
+  //         this.boardList.push(item.board);
+  //       }
+  //     });
+  //   });
+  //   Promise.resolve().then(() => {
+  //     this.service.getAllRailDetails('railDetails').subscribe((data) => {
+  //       this.dataSet = data;
+  //     });
+  //   });
+  //   Promise.resolve().then(() => {
+  //     this.service.getAllRailDetails('machines').subscribe((data) => {
+  //       this.machineList = data;
+  //     });
+  //   });
     
     
-  }
-OnSelectRolling(e){
- console.log(e.target.value)
- let title=e.target.value
- let domain = [];
- this.dataSet = [];
-      if (title == 'ROLLING') {
-        domain = ['machineRolls', 'maintenanceRolls'];
-      } else if (title === 'NON-ROLLING') {
-        domain = ['maintenanceNonRolls', 'machineNonRolls'];
-      } 
-      else if (title === 'ROLLING / NON-ROLLING') {
-        domain = ['machineRolls', 'maintenanceRolls', 'maintenanceNonRolls', 'machineNonRolls'];
-      }
-  for (let ele of domain) {
-    Promise.resolve().then(() => {
-      this.service.getAllMachineRoll(ele).subscribe((data) => {
-        data = data.map((item) => {
-
-          // Integrate values into 'item.integrates'
-          let Itemp = '';
-          for (let ele of item.integrated) { 
-          Itemp += `BLOCK: ${ele.block !== undefined ? ele.block : '-'} | SECTION: ${ele.section1 !== undefined ? ele.section1 : '-'} | DURATION: ${ele.duration !== undefined ? ele.duration : '-'}\n`;
-          }
-          item.integrates = Itemp;
-
-          // Process caution data
-          let cSpeed = '';
-          let cLength = '';
-          let cTdc = '';
-          let cTimeLoss ='';
-          for (let ele of item.caution) {
-            cLength += `${ele.length}\n`;
-            cSpeed += `${ele.speed}\n`;
-            cTdc += `${ele.tdc}\n`;
-            cTimeLoss +=ele.timeloss? `${ ele.timeloss} \n`:''; 
-          }
-          item.cautionLength = cLength;
-          item.cautionSpeed = cSpeed;
-          item.cautionTdc = cTdc;
-          item.cautionTimeLoss= cTimeLoss;
-          return item;
-        });
-    
-        // Update dataset and Handsontable
-        this.dataSet.push(...data);
-        
-      });
-    });
-  }
-  console.log('data---',this.dataSet)
-
-}
+  // }
+  OnSelectRolling(e){
+    console.log(e.target.value)
+    let title=e.target.value
+    let domain = [];
+    this.dataSet = [];
+    if (title === 'MACHINE') {
+     domain = ['machineRolls', 'machineNonRolls'];
+   } else if (title === 'MAINTENANCE') {
+     domain = ['maintenanceRolls', 'maintenanceNonRolls'];
+   } else if (title === 'ROLLING') {
+     domain = ['machineRolls', 'maintenanceRolls'];
+   } else if (title === 'NON-ROLLING') {
+     domain = ['maintenanceNonRolls', 'machineNonRolls'];
+   } else if (title === 'ROLLING / NON-ROLLING') {
+     domain = ['machineRolls', 'maintenanceRolls', 'maintenanceNonRolls', 'machineNonRolls'];
+   }
+     for (let ele of domain) {
+       Promise.resolve().then(() => {
+         this.service.getAllMachineRoll(ele).subscribe((data) => {
+           data = data.map((item) => {
+   
+             // Integrate values into 'item.integrates'
+             let Itemp = '';
+             for (let ele of item.integrated) { 
+             Itemp += `BLOCK: ${ele.block !== undefined ? ele.block : '-'} | SECTION: ${ele.section1 !== undefined ? ele.section1 : '-'} | DURATION: ${ele.duration !== undefined ? ele.duration : '-'}\n`;
+             }
+             item.integrates = Itemp;
+   
+             // Process caution data
+             let cSpeed = '';
+             let cLength = '';
+             let cTdc = '';
+             let cTimeLoss ='';
+             for (let ele of item.caution) {
+               cLength += `${ele.length}\n`;
+               cSpeed += `${ele.speed}\n`;
+               cTdc += `${ele.tdc}\n`;
+               cTimeLoss +=ele.timeloss? `${ ele.timeloss} \n`:''; 
+             }
+             item.cautionLength = cLength;
+             item.cautionSpeed = cSpeed;
+             item.cautionTdc = cTdc;
+             item.cautionTimeLoss= cTimeLoss;
+             return item;
+           });
+       
+           // Update dataset and Handsontable
+           this.dataSet.push(...data);
+           
+         });
+       });
+     }
+     console.log('data---',this.dataSet)
+   
+   }
 
 selectStartDate(e) {
   this.startDate = DateTime.fromISO(e.target.value);
@@ -713,21 +865,23 @@ filterDataWithDate() {
   }
 
   addMachine() {
-    if (this.machine == '') {
-      this.toastService.showWarning('enter valid Details');
+    if (this.machine == '' || this.purse == '') {
+      this.toastService.showWarning('Enter valid details');
       return;
     }
     if (this.machineList.includes(this.machine)) {
-      this.toastService.showDanger(this.machine + ' is already existed');
+      this.toastService.showDanger(this.machine + ' already exists');
       return;
     }
-    const payload = { machine: this.machine };
+    const payload = { machine: this.machine, purse: this.purse };
     this.service.addRailDetails('machines', payload).subscribe((res) => {
-      this.toastService.showSuccess('successfully submitted');
+      this.toastService.showSuccess('Successfully submitted');
       this.machineList.push(res);
       this.machine = '';
+      this.purse = '';
     });
   }
+
 
   onDeleteBoard(data) {
     const confirmDelete = confirm(
@@ -939,21 +1093,25 @@ filterDataWithDate() {
 
   editMachine(data, index) {
     const renameMachine = prompt('Rename the Machine:', data.machine);
-    if (renameMachine === null || renameMachine === data.machine) {
+    const renamePurse = prompt('Rename the Purse:', data.purse);
+    if (renameMachine === null || renameMachine === data.machine){ 
+      if (renamePurse === null || renamePurse === data.purse) {
       return;
     }
-
+  }
     const payload = {
-      machine: renameMachine,
+      machine: renameMachine !== null ? renameMachine: data.machine,
+      purse: renamePurse !== null ? renamePurse: data.purse
     };
 
     this.service
       .updateRailDetails('machines', data._id, payload)
       .subscribe((res) => {
         this.machineList[index] = res;
-        this.toastService.showSuccess('successfully Updated');
+        this.toastService.showSuccess('Successfully Updated');
       });
   }
+
   onTabChange() {
     this.board = '';
     this.section = '';

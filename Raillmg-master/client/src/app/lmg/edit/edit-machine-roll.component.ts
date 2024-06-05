@@ -17,7 +17,7 @@ import { columns } from '../../shared/constants/table-columns';
   standalone: true,
   imports: [HotTableModule, CommonModule],
   templateUrl: './edit-machine-roll.component.html',
-  styleUrl: './edit-machine-roll.component.css',
+  styleUrls: ['./edit-machine-roll.component.css'], // Changed 'styleUrl' to 'styleUrls'
 })
 export class EditMachineRollComponent {
   userData: IUser;
@@ -44,73 +44,72 @@ export class EditMachineRollComponent {
     ...hotSettings,
     columns: this.columns,
     height: '80vh',
-    afterChange: (changes) => {
-      changes?.forEach(
-        ([row, prop, oldValue, newValue]: Handsontable.CellChange) => {
-          const headerKey = prop as string;
 
-          const hot = this.hotRegisterer.getInstance(this.id);
-          let id = hot.getDataAtRow(row)[0];
-          if (
-            oldValue == newValue ||
-            (newValue == '' && oldValue == undefined)
-          ) {
+    afterChange: (changes) => {
+      changes?.forEach(([row, prop, oldValue, newValue]: Handsontable.CellChange) => {
+        const headerKey = prop as string;
+        const hot = this.hotRegisterer.getInstance(this.id);
+        let id = hot.getDataAtRow(row)[0];
+    
+        if (oldValue === newValue || (newValue === '' && oldValue === undefined)) {
+          return;
+        }
+    
+        if (headerKey === 'date') {
+          const parsedDate = DateTime.fromFormat(newValue, 'dd/MM/yyyy');
+          if (!parsedDate.isValid) {
+            this.toastService.showDanger('Date should be DD/MM/YYYY format');
             return;
           }
-          if (headerKey === 'date') {
-            const parsedDate = DateTime.fromFormat(newValue, 'dd/MM/yyyy');
-
-            if (!parsedDate.isValid) {
-              this.toastService.showDanger('Date should be DD/MM/YYYY format');
-              return;
-            }
-          }
-
-          if (headerKey === 'block_start' || headerKey === 'block_end') {
-            const startTime = hot.getDataAtRowProp(row, 'block_start');
-            const endTime = hot.getDataAtRowProp(row, 'block_end');
+        }
     
-            // Ensure both startTime and endTime are not null or undefined
+        if (headerKey === 'block_times') {
+          const timeRanges = newValue.split(',').map((range) => range.trim());
+          let totalMinutes = 0;
+    
+          for (const range of timeRanges) {
+            const [startTime, endTime] = range.split('-').map((time) => time.trim());
             if (startTime && endTime) {
-              // Parse startTime and endTime strings into hours and minutes
               const startParts = startTime.split(':').map(Number);
               const endParts = endTime.split(':').map(Number);
     
-             
-              // Calculate time difference in minutes
               const startTimeMs = startParts[0] * 60 + startParts[1];
               let endTimeMs = endParts[0] * 60 + endParts[1];
-              if(endTimeMs < startTimeMs){
-                 endTimeMs += 24 * 60;
+              if (endTimeMs < startTimeMs) {
+                endTimeMs += 24 * 60;
               }
-              const timeDiffMinutes = endTimeMs - startTimeMs;
-
-              // Update 'time_granted' and 'time_burst' based on time difference in minutes
-              const timeDiffMinutesNum = Number(timeDiffMinutes); // Convert to number
-              hot.setDataAtRowProp(row, 'time_granted', timeDiffMinutes);
-              const avlDuration = hot.getDataAtRowProp(row, 'avl_duration') || 0;
-              hot.setDataAtRowProp(row, 'time_burst', timeDiffMinutes - avlDuration);
+              totalMinutes += (endTimeMs - startTimeMs);
+            } else {
+              this.toastService.showDanger('Each time range must have both start and end times');
+              return;
             }
           }
-          let data = this.dataSet.find((item) => item._id === id);
-          if (!data.logs.length) data.logs = [];
+    
+          hot.setDataAtRowProp(row, 'time_granted', totalMinutes);
+          const avlDuration = hot.getDataAtRowProp(row, 'avl_duration') || 0;
+          const burstTime = totalMinutes > avlDuration ? totalMinutes - avlDuration : 0;
+          hot.setDataAtRowProp(row, 'time_burst', burstTime);
+        }
 
-          const log = {
-            updatedBy: this.userData['username'],
-            updatedAt: new Date().toISOString(),
-            field: headerKey,
-            oldValue,
-            newValue,
-          };
-
-          const payload: Partial<IMachineRoll> = {
-            [headerKey]: newValue,
-            updatedBy: this.userData['username'],
-            updatedAt: new Date().toISOString(),
-            logs: [...data.logs, log],
-          };
-
-          this.service
+        let data = this.dataSet.find((item) => item._id === id);
+        if (!data.logs.length) data.logs = [];
+    
+        const log = {
+          updatedBy: this.userData['username'],
+          updatedAt: new Date().toISOString(),
+          field: headerKey,
+          oldValue,
+          newValue,
+        };
+    
+        const payload: Partial<IMachineRoll> = {
+          [headerKey]: newValue,
+          updatedBy: this.userData['username'],
+          updatedAt: new Date().toISOString(),
+          logs: [...data.logs, log],
+        };
+    
+        this.service
             .updateRailDetails(this.domain, id, payload)
             .subscribe((res: IMachineRoll) => {
               Object.assign(data, res);
@@ -124,25 +123,25 @@ export class EditMachineRollComponent {
         }
       );
     },
+
     afterOnCellMouseUp: (event, coords, TD) => {
-      if (event.target['classList'][0] == 'deleteBtn') {
+      if (event.target['classList'][0] === 'deleteBtn') {
         const hot = this.hotRegisterer.getInstance(this.id);
         let id = hot.getDataAtRow(coords.row)[0];
-        if (!confirm('Are you sure want to delete')) {
+        if (!confirm('Are you sure you want to delete')) {
           return;
         }
-        this.service.deleteRailDetails(this.domain, id).subscribe((res) => {
+        this.service.deleteRailDetails(this.domain, id).subscribe(() => {
           this.dataSet = this.dataSet.filter((item) => item._id !== id);
           hot.updateData(this.dataSet);
-          this.toastService.showSuccess('SUCCESSFULLY DELETED');
+          this.toastService.showSuccess('Successfully Deleted');
         });
       }
+      
     },
-    // afterOnCellMouseDown(event, coords, TD) {
-    //   TD.className = (coords.row % 2 == 0 ? 'evenCell' : 'oddCell') + ' wraptext'
-    // },
+    
   };
-
+  
   constructor(
     private service: AppService,
     private ls: localStorageService,
@@ -154,58 +153,84 @@ export class EditMachineRollComponent {
     this.userData = this.ls.getUser();
     this.route.params.subscribe((url) => {
       this.domain = url['domain'];
-
+  
       Promise.resolve().then(() => {
-        this.service
-          .getAllMachineRoll(this.domain)
-          .subscribe((data: any) => {
-           let hot = this.hotRegisterer.getInstance(this.id);
-            data = data.map((item) => {
-
-
-              // Integrate values into 'item.integrates'
-              let Itemp = '';
-              for (let ele of item.integrated) { 
-                Itemp += `BLOCK: ${ele.block !== undefined ? ele.block : '-'} | SECTION: ${ele.section1 !== undefined ? ele.section1 : '-'} | DURATION: ${ele.duration !== undefined ? ele.duration : '-'}\n`;
+        this.service.getAllMachineRoll(this.domain).subscribe((data: any) => {
+          let hot = this.hotRegisterer.getInstance(this.id);
+  
+          const purseValueMap = new Map<string, number>();
+  
+          data = data.map((item) => {
+            // Integrate values into 'item.integrates'
+            let Itemp = '';
+            for (let ele of item.integrated) {
+              Itemp += `BLOCK: ${ele.block !== undefined ? ele.block : '-'} | SECTION: ${ele.section1 !== undefined ? ele.section1 : '-'} | DURATION: ${ele.duration !== undefined ? ele.duration : '-'}\n`;
+            }
+            item.integrates = Itemp;
+  
+            // Process caution data
+            let cSpeed = '';
+            let cLength = '';
+            let cTdc = '';
+            let cTimeLoss = '';
+            for (let ele of item.caution) {
+              cLength += `${ele.length}  \n`;
+              cSpeed += `${ele.speed}  \n`;
+              cTdc += `${ele.tdc} \n`;
+              cTimeLoss += ele.timeloss ? `${ele.timeloss} \n` : '';
+            }
+  
+            item.cautionLength = cLength;
+            item.cautionSpeed = cSpeed;
+            item.cautionTdc = cTdc;
+            item.cautionTimeLoss = cTimeLoss;
+  
+            // Update remaining purse
+            const purseString = item.purse;
+            let remainPurse = null;
+  
+            if (purseString && purseString.includes(':')) {
+              const purseValueString = purseString.split(':')[1].trim();
+              const purseValue = parseFloat(purseValueString);
+  
+              if (!isNaN(purseValue)) {
+                const timeGrantedValue = parseFloat(item.time_granted);
+  
+                if (!isNaN(timeGrantedValue)) {
+                  remainPurse = (purseValue * 60) - timeGrantedValue;
+                  remainPurse = Math.max(remainPurse, 0); // Ensure non-negative value
+  
+                  // Update remainPurse for the same machine_type
+                  if (!purseValueMap.has(item.machine_type)) {
+                    purseValueMap.set(item.machine_type, remainPurse);
+                  } else {
+                    const prevRemainPurse = purseValueMap.get(item.machine_type);
+                    remainPurse = Math.max(prevRemainPurse - timeGrantedValue, 0);
+                    purseValueMap.set(item.machine_type, remainPurse);
+                  }
                 }
-                item.integrates = Itemp;
-
-
-              // process caution data
-              let cSpeed = '';
-              let cLength = '';
-              let cTdc = '';
-              let cTimeLoss ='';
-              for (let ele of item.caution) {
-                cLength += `${ele.length}  \n`;
-                cSpeed += `${ele.speed}  \n`;
-                cTdc += `${ ele.tdc} \n`;
-                cTimeLoss +=ele.timeloss? `${ ele.timeloss} \n`:''; 
               }
-
-              item.cautionLength = cLength;
-              item.cautionSpeed = cSpeed;
-              item.cautionTdc = cTdc;
-              item.cautionTimeLoss= cTimeLoss;
-               
-
-              return item;
-              });
-
-            data = data.filter(
-                (item) =>
-                  this.userData.department === 'OPERATING' ||
-                  item.department === this.userData.department
-              )
-              .map((item) => {
-                item['delete'] = `DELETE`;
-                return item;
-              });
-
-            this.dataSet = data;
-            hot.updateData(data);
+            }
+  
+            item.remain_purse = remainPurse;
+            return item;
           });
+  
+          // Filter and modify data as needed
+          data = data.filter(
+            (item) =>
+              this.userData.department === 'OPERATING' ||
+              item.department === this.userData.department
+          ).map((item) => {
+            item['delete'] = `DELETE`;
+            return item;
+          });
+  
+          this.dataSet = data;
+          hot.updateData(data);
+        });
       });
     });
   }
+  
 }

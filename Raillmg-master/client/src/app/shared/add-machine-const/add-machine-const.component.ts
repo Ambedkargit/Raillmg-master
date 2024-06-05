@@ -27,8 +27,12 @@ import { ActivatedRoute, Route } from '@angular/router';
 import { Router } from 'express';
 import { PopupService } from '@ng-bootstrap/ng-bootstrap/util/popup';
 import { Injectable } from '@angular/core';
-import { authGuard } from '../service/auth-guard.service';
+import { authGuard } from '../service/auth-guard.service'
 import { cautionTimeLoss } from '../constants/cautioncalculation';
+import { MachinePurseService } from '../constants/machine-purse.service';
+import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { workTypeList } from '../constants/workTypeList';
 @Component({
   selector: 'app-add-machine-const',
   standalone: true,
@@ -41,7 +45,7 @@ import { cautionTimeLoss } from '../constants/cautioncalculation';
     JsonPipe,
     NgbTimepickerModule,
     NgbNavModule,
-    //PopupService
+    
   ],
   templateUrl: './add-machine-const.component.html',
   styleUrl: './add-machine-const.component.css',
@@ -60,6 +64,10 @@ export class AddMachineConstComponent implements OnInit {
     machineNonRolls: 'MACHINE OUT OF ROLLING',
     maintenanceNonRolls: 'MAINTENANCE OUT OF ROLLING',
   };
+
+  machineAndPurseList: { machine: string, purse: string }[] = [];
+  selectedMachine: string = '';
+  purse: string = '';
   form!: FormGroup;
   userData: Partial<IUser> = {};
   availableSlots = {};
@@ -97,8 +105,9 @@ export class AddMachineConstComponent implements OnInit {
   isSlotSelected: boolean = false;
   toastr: any;
   myForm: FormGroup;
-  cautionMps: any = 0;
-  index: any;
+cautionMps: any;
+index: any;
+
   onSlotSelect(event: any) {
       // You can adjust the condition based on the event to determine if a slot is selected.
       this.isSlotSelected = event && event.length > 0;
@@ -110,27 +119,55 @@ export class AddMachineConstComponent implements OnInit {
   get department(): FormControl {
     return this.form.controls['department'] as FormControl;
   }
+  workTypeList = [
+    'PQRS WORK',
+    'MACHINE TAMPING',
+    'M/C PACKING',
+    'RAIL CARRYING',
+    'CTR WORK',
+    'PACKING',
+    'MFI WORK',
+    'TAMPING WORK',
+    'DSMG WORK OF POINT,TRACK, BPAC & SIGNAL',
+    'POST BCM',
+    'POINT PACKING WORK',
+    'CROSS OVER',
+    'RAIL LOADING WORK',
+    'RAIL UNLOADING WORK',
+    'RAIL LOADING & UNLOADING',
+    'LOCAL ADJUSTMENT OF CURVE AND ALLIGNMENT',
+    'OTHERS'
+  ];
 
+  isOtherSelected: boolean = false;
+
+  onWorkTypeChange(event: any) {
+    const selectedValue = event.target.value;
+    this.isOtherSelected = selectedValue === 'OTHERS';
+  }
   constructor(
     private fb: FormBuilder,
     private service: AppService,
     private toastService: ToastService,
     private ls: localStorageService,
     private route: ActivatedRoute,
-    private authGuard: authGuard
-    
+    private authGuard: authGuard,
+    private machinePurseService: MachinePurseService,
+    // private modalService: NgbModal // Inject the NgbModal service
   ) {
-    
+
       this.myForm = this.fb.group({
         avlSlotOtherCheckBox: ['', Validators.required]
       });
-    
+
   }
- 
-
+  
   ngOnInit(): void {
-    console.log(this.domain);
 
+    this.loadMachineAndPurseList();
+    this.initializeForm();
+   // this.initializeForm();
+   // Initialize the properties
     this.userData = this.ls.getUser();
     this.form = this.fb.group({
       department: this.fb.control(
@@ -145,18 +182,53 @@ export class AddMachineConstComponent implements OnInit {
       ),
       machineFormArray: this.fb.array([]),
     });
- 
-    Promise.resolve().then(() => {
-      this.service.getAllRailDetails('machines').subscribe((data) => {
-        this.machineType = data.map((item) => item.machine);
-      });
-    });
+
+    // Promise.resolve().then(() => {
+    //   this.service.getAllRailDetails('machines').subscribe((data) => {
+    //     this.machineType = data.map((item) => item.machine);
+    //   });
+    // });
 
     Promise.resolve().then(() => {
       this.service.getAllRailDetails('boards').subscribe((data) => {
         this.boardList = data;
       });
     });
+  }
+  loadMachineAndPurseList(): void {
+    this.service.getAllRailDetails('machine-purse').subscribe((data) => {
+      this.machineAndPurseList = data.map(item => ({
+        machine: item.machine,
+        purse: item.purse
+      }));
+    });
+  }
+  onMachineSelected(item: ListItem): void {
+    const machineName = item.toString();
+    const selectedCombo = this.machineAndPurseList.find(combo => combo.machine === machineName);
+    if (selectedCombo) {
+      this.machinePurseService.machinePurseData.push(selectedCombo);
+      this.form.get('machine')?.setValue(selectedCombo.machine);
+      this.form.get('purse')?.setValue(selectedCombo.purse);
+      (document.getElementById('purse') as HTMLInputElement).value = (document.getElementById('purse') as HTMLInputElement).value + selectedCombo.purse + ",";
+    }
+  }
+  // Assuming you have a form initialization method
+  initializeForm(): void {
+    this.form = this.fb.group({
+      machine: ['', Validators.required],
+      machineFormArray: this.fb.array([this.createMachineFormGroup()])
+    });
+  }
+
+  createMachineFormGroup(): FormGroup {
+    return this.fb.group({
+      purse: ['', Validators.required]
+    });
+  }
+
+  getMachineNames(): string[] {
+    return this.machineAndPurseList.map(item => item.machine);
   }
 
   onBoardSelect(index, event) {
@@ -172,13 +244,12 @@ export class AddMachineConstComponent implements OnInit {
     let data = this.dataSet.filter((ele) => ele.section === event.target.value);
     this.railDetails[index] = data[0];
   }
-
   onStationSelect(index, event) {
     this.service
       .getAllRailDetails('stations?stations=' + event.target.value)
       .subscribe((res) => {
         console.log(index, res);
-  
+
         // Check if machineFormArray and caution at index exist
         if (this.machineFormArray && this.machineFormArray.value[index]?.caution) {
           // Update caution's mps
@@ -194,133 +265,97 @@ export class AddMachineConstComponent implements OnInit {
 
   onSubmit() {
     if (this.machineFormArray.value.length === 0 || !this.form.valid) {
-        this.toastService.showWarning('Please fill all details');
-        return;
+      this.toastService.showWarning('Please fill all details');
+      return;
     }
-    const currentTime = DateTime.now();
-    const submissionTimeLimit = currentTime.set({ hour: 15, minute: 0, second: 0, millisecond: 0 });
+    //  add for Alert at tpc staff required
 
-   // const previousDomain = this.domain;
+    const userDepartment = this.authGuard.getUserDepartment();
 
-    for (let item of this.machineFormArray.value) {
-        let avlSlotList;
-        if (item.avlSlotOtherCheckBox) {
-            avlSlotList = item.avlSlotOther;
-        } else {
-            avlSlotList = item.availableSlot;
-        }
+    const hasTPCStaff = this.machineFormArray.value.some(item => item.tpcStaff === "Yes");
+    const hasS_TStaff = this.machineFormArray.value.some(item => item.s_tStaff === "Yes");
 
-        for (let slotItem of avlSlotList) {
-            let splitSlot = slotItem.split(' ');
-            const slotDate = DateTime.fromFormat(splitSlot[0], 'dd/MM/yyyy');
-
-             // Check if the slot date is today and type of machinerolls or mainenancerolls
-            if ((this.domain === 'machineRolls' || this.domain === 'maintenanceRolls') &&
-             (slotDate.equals(currentTime.startOf('day')))) {
-              this.toastService.showWarning('Submission for today\'s Rolling demand is not allowed. It will save as Non-Rolling demand. If you want, click on SUBMIT again');
-              if (this.domain === 'machineRolls') {
-                this.domain = 'machineNonRolls';
-            } else if (this.domain === 'maintenanceRolls') {
-                this.domain = 'maintenanceNonRolls';
-            }
-              return;
-              }
-            
-            // Check if the slot date is tomorrow and if the current time is past 15:00 hrs of today
-            if ((slotDate.equals(currentTime.plus({ days: 1 }).startOf('day'))) && (this.domain === 'machineRolls' || this.domain === 'maintenanceRolls') &&
-                currentTime >= submissionTimeLimit) {
-                this.toastService.showWarning('Submission after 15:00 hrs for tomorrow\'s demand is not allowed. It will save in Non-Rolling demand. If you want, click on SUBMIT again');
-                if (this.domain === 'machineRolls') {
-                  this.domain = 'machineNonRolls';
-              } else if (this.domain === 'maintenanceRolls') {
-                  this.domain = 'maintenanceNonRolls';
-              }
-                return;
-               
-            }
-         }
-
+    if (hasTPCStaff || hasS_TStaff) {
+        sessionStorage.setItem('showAlert', 'true');
     }
-    
-
-    // // Check if TRD or S&T Staff is selected as Yes
-    // const hasTPCStaff = this.machineFormArray.value.some(item => item.tpcStaff === "Yes");
-    // const hasS_TStaff = this.machineFormArray.value.some(item => item.s_tStaff === "Yes");
-
-    // // Set showAlert flag in sessionStorage if TRD or S&T Staff is selected as Yes
-    // if (hasTPCStaff || hasS_TStaff) {
-    //     sessionStorage.setItem('showAlert', 'true');
-    // }else {
-    //     sessionStorage.removeItem('showAlert');
-    // }
 
 
     let payload = [];
 
     for (let [index, item] of this.machineFormArray.value.entries()) {
-        let avlSlotList;
-        if (item.avlSlotOtherCheckBox) {
-            avlSlotList = item.avlSlotOther;
-        } else {
-            avlSlotList = item.availableSlot;
+      let avlSlotList;
+      if (item.avlSlotOtherCheckBox) {
+        avlSlotList = item.avlSlotOther;
+      } else {
+        avlSlotList = item.availableSlot;
+      }
+
+      for (let slotItem of avlSlotList) {
+        let splitSlot = [];
+        // if (item.availableSlot) {
+        //   // const regexPattern = new RegExp(
+        //   //   '\\b([0-3][0-9]/[0-1][1-2]/\\d{4}) ([0-2][0-9]:[0-2][0-9]) to ([0-2][0-9]:[0-2][0-9]) (\\b(?:MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY)\\b)\\b'
+        //   // );
+        //   // if (!regexPattern.test(item.avlSlotOther)) {
+        //   //   this.toastService.showDanger('AVAILABLE SLOT ARE INCORRECT FORMAT');
+        //   //   return;
+        //   // }
+
+        //   splitSlot = slotItem.split(' ');
+        // } else {
+        //   splitSlot = item.availableSlot.split(' ');
+        // }
+        splitSlot = slotItem.split(' ');
+
+        if (!item.crewCheckbox || item.crew == null) {
+          item.crew = 0;
         }
-
-        for (let slotItem of avlSlotList) {
-            let splitSlot = slotItem.split(' ');
-
-            if (!item.crewCheckbox || item.crew == null) {
-                item.crew = 0;
-            }
-            if (!item.locoCheckbox || item.loco == null) {
-                item.loco = 0;
-            }
-            item.caution = this.cautions[index];
-            item.integrated = this.integrates[index];
-
-            const startTime = DateTime.fromFormat(splitSlot[1], 'HH:mm');
-            let endTime = DateTime.fromFormat(splitSlot[3], 'HH:mm');
-
-            // Adjust endTime if it's less than startTime
-            if (endTime < startTime) {
-                endTime = endTime.plus({ days: 1 }); // Adding 1 day (24 hours)
-            }
-
-            const timeDifferenceInMinutes = endTime.diff(startTime, 'minutes').minutes;
-
-            payload.push({
-                ...item,
-                avl_start: splitSlot[1],
-                avl_end: splitSlot[3],
-                date: splitSlot[0],
-                department: this.department.value,
-                avl_duration: timeDifferenceInMinutes,
-                createdAt: new Date().toISOString(),
-                createdBy: this.userData.username,
-                updatedAt: new Date().toISOString(),
-                updatedBy: this.userData.username,
-                logs: [],
-            });
+        if (!item.locoCheckbox || item.loco == null) {
+          item.loco = 0;
         }
+        item.caution = this.cautions[index];
+        item.integrated = this.integrates[index];
+
+        const dt = DateTime.now();
+        const startTime = DateTime.fromFormat(splitSlot[1], 'HH:mm');
+        const endTime = DateTime.fromFormat(splitSlot[3], 'HH:mm');
+        const timeDifferenceInMinutes = endTime.diff(
+          startTime,
+          'minutes'
+        ).minutes;
+
+        // item.machine = item.machine.map((item) => {
+        //   return item.machine.trim();
+        // });
+
+        payload.push({
+          ...item,
+          avl_start: splitSlot[1],
+          avl_end: splitSlot[3],
+          date: splitSlot[0],
+          department: this.department.value,
+          avl_duration: timeDifferenceInMinutes,
+          createdAt: new Date().toISOString(),
+          createdBy: this.userData.username,
+          updatedAt: new Date().toISOString(),
+          updatedBy: this.userData.username,
+
+          logs: [],
+        });
+      }
     }
-    payload.sort((a, b) => {
-        const dateA = DateTime.fromFormat(a.date, 'dd/MM/yyyy');
-        const dateB = DateTime.fromFormat(b.date, 'dd/MM/yyyy');
-        return dateA.toMillis() - dateB.toMillis();
-    });
-
+     console.log('🚀 ~ payload:', payload);
+    // return;
     this.service.addRailDetails(this.domain, payload).subscribe((res) => {
-        for (let index = this.machineFormArray.length - 1; index >= 0; index--) {
-            this.machineFormArray.removeAt(index);
-        }
-        if (this.userData.department === 'OPERATING') {
-            this.form.get('department')?.enable();
-        }
-        this.toastService.showSuccess('Successfully submitted');
+      for (let index = this.machineFormArray.length - 1; index >= 0; index--) {
+        this.machineFormArray.removeAt(index);
+      }
+      if (this.userData.department === 'OPERATING') {
+        this.form.get('department')?.enable();
+      }
+      this.toastService.showSuccess('successfully submitted');
     });
-    // this.domain = previousDomain;
-    // window.location.reload();
-}
-
+  }
 
   onAddNewForm() {
     this.form.get('department')?.disable();
@@ -330,7 +365,7 @@ export class AddMachineConstComponent implements OnInit {
       board: '',
       section: '',
       mps: 0,
-      timeLoss: 0,
+      timeloss:0,
       slots: [],
       directions: [],
       stations: [],
@@ -343,8 +378,10 @@ export class AddMachineConstComponent implements OnInit {
       direction: [''],
       lineNo: [null],
       machine: [null],
+      purse:[null],
       series: [null],
       typeOfWork: [null],
+      othertypeofWork: [null],
       dmd_duration: [null],
       availableSlot: [[]],
       avlSlotOther: [[]],
@@ -369,14 +406,14 @@ export class AddMachineConstComponent implements OnInit {
       crewCheckbox: [false],
       loco: [null],
       cautionCheckbox: [false],
-      caution: [{ length: '', tdc: '', speed: 0 , mps: 0, id:'', timeloss: 0}],
+      caution: [{ length: '', tdc: '', speed: 0, mps: 0 ,id:'', timeloss:0 }],
       locoCheckbox: [false],
       // cancelTrain: [null],
       cancelTrainCheckbox: [false],
       integratedCheckbox: [false],
       integrated: [{ block: '', section1: '', duration: 0 }],
     });
-    this.cautions.push([{ length: '', tdc: '', speed: 0, mps: 0, id:'', timeloss: 0}]);
+    this.cautions.push([{ length: '', tdc: '', speed: 0, mps: 0, id:'', timeloss: 0 }]);
     this.integrates.push([{ block: '', section1: '', duration: 0 }]);
     this.machineFormArray.push(machineForm);
 
@@ -394,7 +431,7 @@ export class AddMachineConstComponent implements OnInit {
   }
 
   addCaution(index) {
-    this.cautions[index].push({ length: '', tdc: '', speed: 0, mps: 0, id:'', timeloss: 0});
+    this.cautions[index].push({ length: '', tdc: '', speed: 0, mps: 0, id:'', timeloss: 0 });
   }
 
   addIntegrated(index) {
@@ -439,8 +476,7 @@ export class AddMachineConstComponent implements OnInit {
     this.cautions[index1][index2]['tdc'] = day + '/' + month + '/' + year;
     this.calculateTimeLoss(this.cautions[index1][index2],index1,index2)
   }
-  
-  
+
 
   // Function to generate ID
   calculateTimeLoss(caution,index1,index2) {
@@ -456,6 +492,13 @@ export class AddMachineConstComponent implements OnInit {
     console.log('-----',entry.Time_Loss,entry)
     // return entry ? entry.Time_Loss : 0; // Return 0 if ID not found
   }
+
+  // Function to generate ID
+
+  // Function to generate ID and calculate time loss
+
+
+
 
   integratedBlock($event, index1, index2) {
     this.integrates[index1][index2]['block'] = $event.target.value;
@@ -516,40 +559,19 @@ export class AddMachineConstComponent implements OnInit {
   }
   addSlot() {
     if (!this.slot.date || !this.slot.startTime || !this.slot.endTime) {
-        this.toastService.showDanger('Please fill in all details.');
-        return;
+      this.toastService.showDanger('fill all details');
+      return;
     }
-    
     const parsedDate = DateTime.fromISO(this.slot.date);
-    const formattedDate = parsedDate.toFormat('dd/MM/yyyy');
-    
-    // Calculate slot duration
-    const startHour = this.slot.startTime.hour;
-    const startMinute = this.slot.startTime.minute;
-    const endHour = this.slot.endTime.hour;
-    const endMinute = this.slot.endTime.minute;
-    const durationInMinutes = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
-  
-    // Construct slot text with start and end time
-    const startTimeText = `${startHour.toString().padStart(2, '0')}:${startMinute.toString().padStart(2, '0')}`;
-    const endTimeText = `${endHour.toString().padStart(2, '0')}:${endMinute.toString().padStart(2, '0')}`;
-    const text = `${formattedDate} ${startTimeText} to ${endTimeText} hrs (Duration: ${durationInMinutes} minutes)`;
-    
-    // Push the text to the avlSlotOther array
+    const formattedDate = parsedDate.toFormat('dd/LL/yyyy');
+    let text = `${formattedDate} ${this.slot.startTime.hour}:${this.slot.startTime.minute} to ${this.slot.endTime.hour}:${this.slot.endTime.minute} hrs`;
     this.machineFormArray.value[this.slotIndex].avlSlotOther.push(text);
-    
-    // Update avl_duration column
-    const row = this.machineFormArray.at(this.slotIndex);
-    const avlDuration = row.get('avl_duration').value || 0;
-    row.get('avl_duration').setValue(avlDuration + durationInMinutes);
-  
-    // Reset slot values
     this.slot = {
-        date: '',
-        startTime: { hour: 0, minute: 0 },
-        endTime: { hour: 0, minute: 0 },
+      date: '',
+      startTime: '',
+      endTime: '',
     };
-}  
+  }
   deleteSlot(formIndex, slotIndex) {
     this.machineFormArray.value[this.slotIndex].avlSlotOther.splice(
       slotIndex,

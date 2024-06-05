@@ -3,6 +3,12 @@ import { machineType } from './machineType';
 import { sectionList } from './section-list';
 import { stationList } from './station-list';
 import { ILog } from '../model/machineRoll.model';
+import { timeStamp } from 'console';
+import { cautionTimeLoss } from './cautioncalculation';
+import { MachinePurseService } from './machine-purse.service';
+
+const machinePurseService = new MachinePurseService();
+const  machinePurseData = machinePurseService.machinePurseData;
 
 const LogInfoRender = (
   instance: Handsontable.Core,
@@ -112,6 +118,8 @@ export const columns: Handsontable.ColumnSettings[] = [
     data: 'board',
     title: 'BOARD',
     type: 'text',
+    editor: 'false',
+    readOnly: true,
     // selectOptions: ['BG1', 'BG2', 'BG3', 'BG4', 'BG5'],
     width: 70,
   },
@@ -119,6 +127,8 @@ export const columns: Handsontable.ColumnSettings[] = [
     data: 'section',
     title: 'SECTION',
     type: 'text',
+    editor: 'false',
+    readOnly: true,
     // selectOptions: sectionList,
     width: 80,
   },
@@ -134,6 +144,8 @@ export const columns: Handsontable.ColumnSettings[] = [
     data: 'stationFrom',
     title: 'STATION FROM',
     type: 'text',
+    editor: 'false',
+    readOnly: true,
     // selectOptions: stationList,
     width: 120,
   },
@@ -141,12 +153,16 @@ export const columns: Handsontable.ColumnSettings[] = [
     data: 'stationTo',
     title: 'STATION TO',
     type: 'text',
+    editor: 'false',
+    readOnly: true,
     // selectOptions: stationList,
     width: 100,
   },
   
   { data: 'km', title: 'KILOMETER', width: 150 },
   { data: 'typeOfWork', title: 'WORK TYPE', width: 110 },
+  { data: 'othertypeofWork', title: 'OTHER WORK ', width: 110 },
+
   {
     data: 'machine',
     title: 'MACHINE TYPE',
@@ -155,16 +171,19 @@ export const columns: Handsontable.ColumnSettings[] = [
     width: 150,
   },
   { data: 'series', title: 'SERIES', width: 80 },
-  { data: 'block_start', title: 'BLOCK START', width: 120 },
-  { data: 'block_end', title: 'BLOCK END', width: 100 },
-  { data: 'time_granted', title: 'TIME GRANTED', width: 120 },
-  { data: 'time_burst', title: 'BURST TIME', width: 100 },
+  { data: 'purse', title: 'PURSE TIME', width: 100 },
+  { data: 'remain_purse', title: 'REMAIN PURSE', width: 140, editor: 'false', readOnly: true },
+  // { data: 'block_start', title: 'BLOCK START', width: 120 },
+  // { data: 'block_end', title: 'BLOCK END', width: 100 },
+  { data: 'block_times', title: 'BLOCK TIME', width: 110 },
+  { data: 'time_granted', title: 'TIME GRANTED', width: 120, editor: 'false', readOnly: true },
+  { data: 'time_burst', title: 'BURST TIME', width: 100, editor: 'false', readOnly: true },
   { data: 'output', title: 'OUTPUT', width: 100 },
   { data: 'quantum', title: 'QUANTUM', width: 100 },
-  { data: 'avl_start', title: ' SLOT START', width: 100 },
-  { data: 'avl_end', title: ' SLOT END', width: 90 },
-  { data: 'avl_duration', title: 'AVL DUR...', width: 100 },
-  { data: 'dmd_duration', title: 'DMD DUR...', width: 100 },
+  { data: 'avl_start', title: ' SLOT START', width: 100, editor: 'false', readOnly: true },
+  { data: 'avl_end', title: ' SLOT END', width: 90, editor: 'false', readOnly: true },
+  { data: 'avl_duration', title: 'AVL DUR...', width: 100, editor: 'false', readOnly: true },
+  { data: 'dmd_duration', title: 'DMD DUR...', width: 100, editor: 'false', readOnly: true },
   
   
   // { data: 'ni', title: ' NI/Non-NI Work', width: 130 },
@@ -175,7 +194,7 @@ export const columns: Handsontable.ColumnSettings[] = [
     title: 'AVAIL STATUS',
     type: 'checkbox',
     defaultData: true,
-    width: 120,
+    width: 120
   },
   
  { data: 'deputedSupervisor', title: 'DEPUTED SUP...', width: 120 },
@@ -190,13 +209,13 @@ export const columns: Handsontable.ColumnSettings[] = [
   // { data: 'tower', title: 'TOWER/MAT...', width: 110 },
   // { data: 'cancelTrain', title: 'TRAIN CANCEL...', width: 130 },
 
-  {
-    data: 'burst',
-    title: 'BLOCK DETAILS',
-    type: 'select',
-    selectOptions: ['BLOCK BURST', 'Block Ended on Time', 'BLOCK EXTENDED'],
-    width: 120,
-  },
+  // {
+  //   data: 'burst',
+  //   title: 'BLOCK DETAILS',
+  //   type: 'select',
+  //   selectOptions: ['BLOCK BURST', 'Block Ended on Time', 'BLOCK EXTENDED'],
+  //   width: 120,
+  // },
 
   {
     data: 'integrates',
@@ -246,6 +265,11 @@ export const columns: Handsontable.ColumnSettings[] = [
   {
     data: 'cautionTimeLoss',
     title: 'TIME LOSS',
+    width: 120, 
+  },
+  {
+    data: 'fit_time',
+    title: 'M/C FIT TIME',
     width: 120, 
   },
   // {

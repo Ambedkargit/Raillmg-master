@@ -6,4 +6,5 @@ export interface IRailForm {
   slots: {};
   directions: string[];
   stations: object;
+  purse: string;
 }

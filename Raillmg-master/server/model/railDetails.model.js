@@ -8,7 +8,9 @@ const railDetailsSchema = new Schema({
     section: { type: String, unique: true },
     directions: { type: Array },
     slots: { type: Object, default: {} },
-    stations: { type: Array }
+    stations: { type: Array },
+    purses: { type: Array},
+    remain_purse: { type: String }
 }, {
     versionKey: false
 })

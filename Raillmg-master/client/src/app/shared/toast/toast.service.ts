@@ -8,6 +8,9 @@ export interface Toast {
 
 @Injectable({ providedIn: 'root' })
 export class ToastService {
+    showError(arg0: string) {
+      throw new Error('Method not implemented.');
+    }
     
     toasts: Toast[] = [];
 

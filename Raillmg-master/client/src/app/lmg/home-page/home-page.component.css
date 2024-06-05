@@ -1,8 +1,9 @@
 .home {
-  background-image: url(../../../assets/home.jpg);
-  height: 94.6svh;
+  background-image: url(../../../assets/homepage2.jpg);
+  height: 90.6svh;
   background-repeat: no-repeat;
   background-size: cover;
+  
 }
 .heading {
   position: absolute;

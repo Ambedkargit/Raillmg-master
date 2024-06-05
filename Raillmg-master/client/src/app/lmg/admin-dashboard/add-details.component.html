@@ -5,7 +5,7 @@
         <ng-container ngbNavItem="board">
           <button ngbNavLink (click)="onTabChange()">BOARD</button>
           <ng-template ngbNavContent>
-            <div class="row ">
+            <div class="row">
               <div class="col-6 AddDetails">
                 <label>BOARD</label>
                 <input id="typeahead-format" class="form-control mt-3 mb-3" type="text" name="board"
@@ -15,7 +15,6 @@
               <div class="col-6">
                 <div class="row">
                   <div class="col-8">
-
                     <h3 class="">Already added BOARD</h3>
                   </div>
                   <div class="col-4 d-flex">
@@ -24,28 +23,23 @@
                   </div>
                 </div>
                 <ol class="fs-5">
-                  @for(item of boardDataset; track $index){
-                  <li>
+                  <li *ngFor="let item of boardDataset">
                     <div class="row">
                       <div class="col-8">
-
-                        {{item.board}}
+                        {{ item.board }}
                       </div>
                       <div class="col-4">
-
-                        <button class="btn btn-success me-3" (click)="editBoard(item)">edit</button>
-                        <button class="btn btn-outline-danger" (click)="onDeleteBoard(item)">x</button>
+                        <button  class="btn btn-success me-3" (click)="editBoard(item)">edit</button>
+                        <button  class="btn btn-outline-danger" (click)="onDeleteBoard(item)">x</button>
                       </div>
                     </div>
-
                   </li>
-                  }
                 </ol>
               </div>
             </div>
-
           </ng-template>
         </ng-container>
+        
 
         <ng-container ngbNavItem="section">
           <button ngbNavLink (click)="onTabChange()">SECTION</button>
@@ -89,8 +83,8 @@
                       </div>
                       <div class="col-4">
 
-                        <button class="btn btn-success me-3" (click)="editSection(item, $index)">edit</button>
-                        <button class="btn btn-outline-danger"
+                        <button *ngIf="username === 'AA'" class="btn btn-success me-3" (click)="editSection(item, $index)">edit</button>
+                        <button *ngIf="username === 'AA'" class="btn btn-outline-danger"
                           (click)="onDeleteSection(item._id, item.section)">x</button>
                       </div>
                     </div>
@@ -151,8 +145,8 @@
                       </div>
                       <div class="col-4">
 
-                        <button class="btn btn-success me-3" (click)="editStation(station,$index)">edit</button>
-                        <button class="btn btn-outline-danger" (click)="onDeleteStation(station)">x</button>
+                        <button *ngIf="username === 'AA'" class="btn btn-success me-3" (click)="editStation(station,$index)">edit</button>
+                        <button *ngIf="username === 'AA'" class="btn btn-outline-danger" (click)="onDeleteStation(station)">x</button>
                       </div>
                     </div>
                   </li>
@@ -277,7 +271,7 @@
                         }
                       </div>
                       <div class="col-3">
-                        <button class="btn btn-outline-danger" (click)="onDeleteAvlSlot(ele.key)">x</button>
+                        <button *ngIf="username === 'AA'" class="btn btn-outline-danger" (click)="onDeleteAvlSlot(ele.key)">x</button>
                       </div>
                     </div>
                   </li>
@@ -348,8 +342,8 @@
                         {{stationSelected.mps}} km/hr
                       </div>
                       <div class="col-4">
-                        <button class="btn btn-success me-3" (click)="addMPS(false, true)">edit</button>
-                        <button class="btn btn-outline-danger" (click)="addMPS(false)">x</button>
+                        <button  class="btn btn-success me-3" (click)="addMPS(false, true)">edit</button>
+                        <button  class="btn btn-outline-danger" (click)="addMPS(false)">x</button>
                       </div>
                     </div>
                   </li>
@@ -362,20 +356,25 @@
         </ng-container>
 
 
-        <ng-container ngbNavItem="machine">
-          <button ngbNavLink (click)="onTabChange()">MACHINE</button>
+        <!-- <ng-container ngbNavItem="machine-purse">
+          <button ngbNavLink (click)="onTabChange()">MACHINE & PURSE</button>
           <ng-template ngbNavContent>
+            Machine Section
             <div class="row">
               <div class="col-6 AddDetails">
                 <label>MACHINE</label>
-                <input id="typeahead-format" class="form-control mt-3 mb-3" type="text" name="machine"
-                  [(ngModel)]="machine" />
+                <input id="typeahead-format" class="form-control mt-3 mb-3" type="text" name="machine" [(ngModel)]="machine" />
+                <label>PURSE</label>
+                <input id="typeahead-format" class="form-control mt-3 mb-3" type="text" name="purse" [(ngModel)]="purse" />
                 <button class="btn btn-primary form-control mt-3" (click)="addMachine()">ADD</button>
               </div>
               <div class="col-6">
                 <div class="row">
-                  <div class="col-8">
+                  <div class="col-4">
                     <h3 class="">MACHINES</h3>
+                  </div>
+                  <div class="col-4">
+                    <h3 class="">PURSES</h3>
                   </div>
                   <div class="col-4 d-flex">
                     <div class="me-3 ms-3">EDIT</div>
@@ -383,26 +382,93 @@
                   </div>
                 </div>
                 <ol class="fs-5">
-                  @for(item of machineList; track $index){
-                  <li>
+                  <li *ngFor="let item of machineList; let i = index">
                     <div class="row">
-                      <div class="col-8">
-
-                        {{item.machine}}
-                      </div>
+                      <div class="col-4">{{ item.machine }}</div>
+                      <div class="col-4">{{ item.purse }} Hrs</div>
                       <div class="col-4">
-
-                        <button class="btn btn-success me-3" (click)="editMachine(item, $index)">edit</button>
+                        <button class="btn btn-success me-3" (click)="editMachine(item, i)">edit</button>
                         <button class="btn btn-outline-danger" (click)="onDeleteMachine(item)">x</button>
                       </div>
                     </div>
                   </li>
-                  }
                 </ol>
               </div>
-            </div>
+            </div> 
           </ng-template>
-        </ng-container>
+        </ng-container>-->
+        
+            <ng-container ngbNavItem="machine-purse">
+              <button ngbNavLink (click)="onTabChange()">MACHINE & PURSE</button>
+              <ng-template ngbNavContent>
+                <!-- Machine Section -->
+                <div class="row">
+                  <div class="col-6 AddDetails">
+                    <label>MACHINE</label>
+                    <input id="typeahead-format" class="form-control mt-3 mb-3" type="text" name="machine" [(ngModel)]="machine" />
+                    <button class="btn btn-primary form-control mt-3" (click)="addMachine()">ADD</button>
+                  </div>
+                  <div class="col-6">
+                    <div class="row">
+                      <div class="col-8">
+                        <h3 class="">MACHINES</h3>
+                      </div>
+                      <div class="col-4 d-flex">
+                        <div class="me-3 ms-3">EDIT</div>
+                        <div class="">DELETE</div>
+                      </div>
+                    </div>
+                    <ol class="fs-5">
+                      <li *ngFor="let item of machineList; let i = index">
+                        <div class="row">
+                          <div class="col-8">{{ item.machine }}</div>
+                          <div class="col-4">
+                            <button class="btn btn-success me-3" (click)="editMachine(item, i)">edit</button>
+                            <button class="btn btn-outline-danger" (click)="onDeleteMachine(item)">x</button>
+                          </div>
+                        </div>
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+            
+                <div class="row">
+                  <div class="col-6 AddDetails">
+                    <label>Select Machine</label>
+                    <select class="form-control mt-3 mb-3" [(ngModel)]="selectedMachine" (change)="onMachineSelected()">
+                      <option value="">Select Machine</option>
+                      <option *ngFor="let machine of machineList" [ngValue]="machine">{{ machine.machine }}</option>
+                    </select>
+                    <label>Purse in Minutes</label>
+                    <input id="typeahead-format" class="form-control mt-3 mb-3" type="text" name="purse" [(ngModel)]="purse" />
+                    <button class="btn btn-primary form-control mt-3" (click)="addPurseForMachine()">ADD</button>
+                  </div>
+                  <div class="col-6">
+                    <div class="row">
+                      <div class="col-8">
+                        <h3 class="">MACHINES & PURSES</h3>
+                      </div>
+                      <div class="col-4 d-flex">
+                        <div class="me-3 ms-3">EDIT</div>
+                      </div>
+                    </div>
+                    <ol class="fs-5">
+                      <li *ngFor="let item of machineAndPurseList; let i = index">
+                        <div class="row">
+                          <div class="col-4">{{ item.machine.machine }}</div>
+                          <div class="col-4">{{ item.purse }}</div>
+                          <div class="col-4">
+                            <button class="btn btn-success me-3" (click)="editPurse(item)">edit</button>
+                          </div>
+                        </div>
+                      </li>
+                    </ol>
+                  </div>
+                </div>
+            
+              </ng-template>
+            </ng-container>
+        
 
         <ng-container ngbNavItem="add-report">
           <button ngbNavLink (click)="onTabChange()">GENERATE REPORT</button>
@@ -453,8 +519,15 @@
                     <button class="btn btn-primary" (click)="ResetDates()">Reset</button>
                   </div> -->
                 </div>
+                <select id="reportTypeDropdown" class="btn btn-primary form-control mt-3" (change)="onReportTypeChange($event)">
+                  <option value="">Select Report Type</option>
+                  <option value="reportType1">LMG DIV DAILY BASIS ENGG BLOCK POSITION(MACHINE BLOCK)</option>
+                  <option value="reportType2">LMG DIV DAILY BASIS ENGG BLOCK POSITION(NON-MACHINE BLOCK)</option>
+                  <!-- Add more options as needed -->
+                </select>
+
                 <button class="btn btn-primary form-control mt-3" (click)="generateReport()">GENERATE REPORT</button>
-                <button class="btn btn-primary form-control mt-3" (click)="downloadPDF()">DOWNLOAD PDF</button>
+                <!-- <button class="btn btn-primary form-control mt-3" (click)="downloadPDF()">DOWNLOAD PDF</button> -->
                 <button class="btn btn-primary form-control mt-3" (click)="downloadExcel()">DOWNLOAD EXCEL</button>
                 
                 <!-- Display the preview here -->

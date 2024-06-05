@@ -19,6 +19,7 @@ import { NonRollingDemandComponent } from './lmg/verify-demand/non-rolling-deman
 import { SignNonRollingDemandComponent } from './lmg/sign/sign-non-rolling-demand/sign-non-rolling-demand.component';
 import { SignRollingDemandComponent } from './lmg/sign/sign-rolling-demand/sign-rolling-demand.component';
 import { DigitalSignComponent } from './lmg/sign/digital-sign/digital-sign.component';
+import { BlockPurseComponent } from './lmg/block-purse/block-purse.component';
 import { TsrSummaryComponent } from './tsr-summary/tsr-summary.component';
 
 export const routes: Routes = [
@@ -101,6 +102,10 @@ export const routes: Routes = [
       {
         path: 'edit/:domain',
         component: EditMachineRollComponent,
+      },
+      {
+        path: 'purse',
+        component: BlockPurseComponent,
       },
       {
         path: 'dashboard',
