@@ -12,7 +12,7 @@ const LogSchema = new Schema({
     versionKey: false
 })
 
-const machineRollSchema = new Schema({
+const machineRollSchema = new mongoose.Schema({
     _id: { type: mongoose.Types.ObjectId, auto: true },
     date: { type: String },
     department: { type: String },
@@ -42,7 +42,7 @@ const machineRollSchema = new Schema({
     tpcStaff: { type: String },
     // point: { type: String },
     // tower: { type: String },
-    burst: { type: String, default: 'Block Ended on Time' },
+    //burst: { type: String, default: 'Block Ended on Time' },
     grant_status: { type: String, default: 'Pending' },
     block_times: {type: String},
     time_granted: { type: Number},
@@ -69,7 +69,7 @@ const machineRollSchema = new Schema({
     a: { type: Number },
     machinepurse: { type: String },
     purse: { type: String },
-    remain_purse: { type: String },
+    remain_purse: { type: Number },
     block_type: { type: String },
     rolling_stock: { type: String }
 }, {

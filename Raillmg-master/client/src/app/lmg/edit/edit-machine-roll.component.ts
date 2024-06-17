@@ -66,17 +66,25 @@ export class EditMachineRollComponent {
         if (headerKey === 'block_times') {
           const timeRanges = newValue.split(',').map((range) => range.trim());
           let totalMinutes = 0;
-    
+        
           for (const range of timeRanges) {
-            const [startTime, endTime] = range.split('-').map((time) => time.trim());
+            let startTime, endTime;
+            if (range.includes('/')) {
+              const [start, end] = range.split('/').map((time) => time.trim());
+              startTime = start.split('-')[0].trim();
+              endTime = end.trim();
+            } else {
+              [startTime, endTime] = range.split('-').map((time) => time.trim());
+            }
+        
             if (startTime && endTime) {
               const startParts = startTime.split(':').map(Number);
               const endParts = endTime.split(':').map(Number);
-    
+        
               const startTimeMs = startParts[0] * 60 + startParts[1];
               let endTimeMs = endParts[0] * 60 + endParts[1];
               if (endTimeMs < startTimeMs) {
-                endTimeMs += 24 * 60;
+                endTimeMs += 24 * 60; // Adjust for overnight ranges
               }
               totalMinutes += (endTimeMs - startTimeMs);
             } else {
@@ -84,6 +92,7 @@ export class EditMachineRollComponent {
               return;
             }
           }
+        
     
           hot.setDataAtRowProp(row, 'time_granted', totalMinutes);
           const avlDuration = hot.getDataAtRowProp(row, 'avl_duration') || 0;
@@ -153,13 +162,10 @@ export class EditMachineRollComponent {
     this.userData = this.ls.getUser();
     this.route.params.subscribe((url) => {
       this.domain = url['domain'];
-  
       Promise.resolve().then(() => {
         this.service.getAllMachineRoll(this.domain).subscribe((data: any) => {
           let hot = this.hotRegisterer.getInstance(this.id);
-  
-          const purseValueMap = new Map<string, number>();
-  
+          const purseValueMap: { [key: string]: number } = {};
           data = data.map((item) => {
             // Integrate values into 'item.integrates'
             let Itemp = '';
@@ -185,36 +191,36 @@ export class EditMachineRollComponent {
             item.cautionTdc = cTdc;
             item.cautionTimeLoss = cTimeLoss;
   
-            // Update remaining purse
-            const purseString = item.purse;
-            let remainPurse = null;
-  
-            if (purseString && purseString.includes(':')) {
-              const purseValueString = purseString.split(':')[1].trim();
-              const purseValue = parseFloat(purseValueString);
-  
-              if (!isNaN(purseValue)) {
-                const timeGrantedValue = parseFloat(item.time_granted);
-  
-                if (!isNaN(timeGrantedValue)) {
-                  remainPurse = (purseValue * 60) - timeGrantedValue;
-                  remainPurse = Math.max(remainPurse, 0); // Ensure non-negative value
-  
-                  // Update remainPurse for the same machine_type
-                  if (!purseValueMap.has(item.machine_type)) {
-                    purseValueMap.set(item.machine_type, remainPurse);
-                  } else {
-                    const prevRemainPurse = purseValueMap.get(item.machine_type);
-                    remainPurse = Math.max(prevRemainPurse - timeGrantedValue, 0);
-                    purseValueMap.set(item.machine_type, remainPurse);
-                  }
-                }
-              }
-            }
-  
-            item.remain_purse = remainPurse;
-            return item;
-          });
+         // Update remaining purse
+         const purseString = item.purse;
+         let remainPurse = null;
+
+         if (purseString && purseString.includes(':')) {
+           const purseValueString = purseString.split(':')[1].trim();
+           const purseValue = parseFloat(purseValueString);
+
+           if (!isNaN(purseValue)) {
+             const timeGrantedValue = parseFloat(item.time_granted);
+
+             if (!isNaN(timeGrantedValue)) {
+               const machineType = item.machine;
+               const prevRemainPurse = purseValueMap[machineType] || null;
+
+               if (prevRemainPurse !== null) {
+                 remainPurse = prevRemainPurse - timeGrantedValue;
+               } else {
+                 remainPurse = (purseValue) - timeGrantedValue;
+               }
+
+               purseValueMap[machineType] = remainPurse;
+             }
+           }
+         }
+
+         item.remain_purse = remainPurse;
+
+         return item;
+       });
   
           // Filter and modify data as needed
           data = data.filter(

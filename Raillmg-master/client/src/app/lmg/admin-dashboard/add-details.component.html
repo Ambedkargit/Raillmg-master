@@ -83,8 +83,8 @@
                       </div>
                       <div class="col-4">
 
-                        <button *ngIf="username === 'AA'" class="btn btn-success me-3" (click)="editSection(item, $index)">edit</button>
-                        <button *ngIf="username === 'AA'" class="btn btn-outline-danger"
+                        <button class="btn btn-success me-3" (click)="editSection(item, $index)">edit</button>
+                        <button  class="btn btn-outline-danger"
                           (click)="onDeleteSection(item._id, item.section)">x</button>
                       </div>
                     </div>
@@ -145,8 +145,8 @@
                       </div>
                       <div class="col-4">
 
-                        <button *ngIf="username === 'AA'" class="btn btn-success me-3" (click)="editStation(station,$index)">edit</button>
-                        <button *ngIf="username === 'AA'" class="btn btn-outline-danger" (click)="onDeleteStation(station)">x</button>
+                        <button  class="btn btn-success me-3" (click)="editStation(station,$index)">edit</button>
+                        <button  class="btn btn-outline-danger" (click)="onDeleteStation(station)">x</button>
                       </div>
                     </div>
                   </li>
@@ -271,7 +271,7 @@
                         }
                       </div>
                       <div class="col-3">
-                        <button *ngIf="username === 'AA'" class="btn btn-outline-danger" (click)="onDeleteAvlSlot(ele.key)">x</button>
+                        <button  class="btn btn-outline-danger" (click)="onDeleteAvlSlot(ele.key)">x</button>
                       </div>
                     </div>
                   </li>
@@ -515,12 +515,12 @@
                     <input type="date" (change)="selectEndDate($event)" class="form-control">
                   </div>
                   
-                  <!-- <div class="col-2">
-                    <button class="btn btn-primary" (click)="ResetDates()">Reset</button>
-                  </div> -->
+                  <div class="col-3">
+                    <button class="btn btn-primary" (click)="ResetData()">Reset</button>
+                  </div>
                 </div>
                 <select id="reportTypeDropdown" class="btn btn-primary form-control mt-3" (change)="onReportTypeChange($event)">
-                  <option value="">Select Report Type</option>
+                  <option value="window.location.reload()" >SELECT REPORT TYPE</option>
                   <option value="reportType1">LMG DIV DAILY BASIS ENGG BLOCK POSITION(MACHINE BLOCK)</option>
                   <option value="reportType2">LMG DIV DAILY BASIS ENGG BLOCK POSITION(NON-MACHINE BLOCK)</option>
                   <!-- Add more options as needed -->

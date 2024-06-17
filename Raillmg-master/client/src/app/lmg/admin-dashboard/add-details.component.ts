@@ -14,7 +14,9 @@ import html2canvas from 'html2canvas';
 import { DateTime } from 'luxon';
 import { HotTableModule, HotTableRegisterer } from '@handsontable/angular';
 import * as XLSX from 'xlsx';
+import { NgModule } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { index } from 'handsontable/helpers/dom';
 
 @Component({
   selector: 'app-add-details',
@@ -27,11 +29,11 @@ import { HttpClient } from '@angular/common/http';
     NgbNavModule,
   ],
   templateUrl: './add-details.component.html',
-  styleUrl: './add-details.component.css',
+  styleUrls: ['./add-details.component.css'],
 })
 export class AddDetailsComponent implements OnInit {
-  
 
+  
   columns: any[] = columns; // Assign the columns array
   dataSet: any[] = [];
   selectedColumns: string[] = [];
@@ -177,19 +179,12 @@ export class AddDetailsComponent implements OnInit {
     'reportType2': ['date', 'department', 'section','stationFrom','stationTo','typeOfWork','avl_start','avl_end','dmd_duration','time_granted','output','time_burst','OPTG_remarks','APL_remarks'],
     // Add more report types as needed
   };
-  
-
 generateReport() {
   console.log('Generating report with columns:', this.selectedColumns);
   console.log('DataSet:', this.dataSet);
   this.generatedReport = this.generateReportLogic(this.selectedColumns);
 }
 generateReportLogic(selectedColumns: string[], selectedDepartment?: string): any {
-  // if (!this.selectedDepartment) {
-  //   console.error('Selected department is not defined!');
-  //   return;
-  // }
-
   if (!this.dataSet || this.dataSet.length === 0) {
     console.error('Dataset is empty or undefined!');
     return; // Return or handle error appropriately
@@ -197,7 +192,6 @@ generateReportLogic(selectedColumns: string[], selectedDepartment?: string): any
 
   // Filter the dataset based on the selected date range and board
   const filteredData = this.dataSet.filter(item => {
-    // Ensure the 'date', 'board', and 'department' properties exist and are valid
     if (!item.date || typeof item.date !== 'string' ||
         !item.board || typeof item.board !== 'string' ||
         !item.department || typeof item.department !== 'string') {
@@ -206,23 +200,30 @@ generateReportLogic(selectedColumns: string[], selectedDepartment?: string): any
 
     const parsedDate = DateTime.fromFormat(item.date, 'dd/MM/yyyy');
 
-    // Check if the parsedDate falls within the selected date range, board, and department
     if (
       (this.startDate === undefined || this.startDate <= parsedDate) &&
       (this.endDate === undefined || this.endDate >= parsedDate) &&
       (this.selectedBoard === undefined || this.selectedBoard === item.board) &&
-      (this.selectedDepartment ===undefined || this.selectedDepartment === item.department)
+      (this.selectedDepartment === undefined || this.selectedDepartment === item.department)
     ) {
       return true;
     }
 
     return false;
-  
-  }).map(item => {
-    // Create a filtered item object with selected columns
-    const filteredItem: any = {};
+  });
+
+  // Sort the filtered data before adding serial numbers
+  filteredData.sort((a, b) => {
+    const dateA = DateTime.fromFormat(a.date, 'dd/MM/yyyy');
+    const dateB = DateTime.fromFormat(b.date, 'dd/MM/yyyy');
+    return dateA.toMillis() - dateB.toMillis();
+  });
+
+  // Add serial numbers after sorting
+  const serialNumberedData = filteredData.map((item, index) => {
+    const filteredItem: any = { serialNumber: index + 1 }; // Add serial number
+
     selectedColumns.forEach(column => {
-      // Check if column exists in item before accessing it
       if (item.hasOwnProperty(column)) {
         filteredItem[column] = item[column];
       }
@@ -230,22 +231,18 @@ generateReportLogic(selectedColumns: string[], selectedDepartment?: string): any
     return filteredItem;
   });
 
-  filteredData.sort((a, b) => {
-    const dateA = DateTime.fromFormat(a.date, 'dd/MM/yyyy');
-    const dateB = DateTime.fromFormat(b.date, 'dd/MM/yyyy');
-    return dateA.toMillis() - dateB.toMillis();
-  });
-
-  // Construct the report object
   const report = {
-    selectedColumns: selectedColumns,
-    reportData: filteredData
+    selectedColumns: ['serialNumber', ...selectedColumns], // Include serialNumber in selectedColumns
+    reportData: serialNumberedData
   };
 
   console.log("Selected Department:", selectedDepartment); // Log selected department for debugging
 
   return report;
 }
+
+
+
 onColumnSelectionChange(columnTitle: string) {
   const index = this.selectedColumns.indexOf(columnTitle);
   if (index === -1) {
@@ -254,7 +251,6 @@ onColumnSelectionChange(columnTitle: string) {
     this.selectedColumns.splice(index, 1);
   }
 }
-
 onReportTypeChange(event: Event) {
   const reportTypeDropdown = event.target as HTMLSelectElement;
   const selectedReportType = reportTypeDropdown.value;
@@ -265,112 +261,6 @@ onReportTypeChange(event: Event) {
   }
 }
 
-downloadPDF() {
-  const reportData = this.generateReportLogic(this.selectedColumns);
-
-  if (!reportData || reportData.reportData.length === 0) {
-    console.error('No data available for download');
-    return;
-  }
-
-  // Define the gap size between columns
-  const columnGap = 25; // Adjust as needed
-
-  // Convert report data to HTML table
-  const tableHtml = '<table style="width:100%">' + // Set the table width to 100%
-    '<thead>' +
-    '<tr>' +
-    reportData.selectedColumns.map(column => `<th>${column.toUpperCase()}</th>`).join('') +
-    '</tr>' +
-    '</thead>' +
-    '<tbody>' +
-    reportData.reportData.map(row =>
-      '<tr>' +
-      reportData.selectedColumns.map(column => {
-        const value = row[column];
-        return `<td style="padding: 25px;">${value !== null ? value : ''}</td>`; // Apply padding to create gap
-      }).join('') +
-      '</tr>'
-    ).join('') +
-    '</tbody>' +
-    '</table>';
-
-   // Load the JPG image
-   const img = new Image();
-   img.src = '/assets/cover_page.jpg'; // Replace 'path/to/your/image.jpg' with the actual path to your JPG file
-   img.onload = function() {
-     const canvas = document.createElement('canvas');
-     canvas.width = img.width;
-     canvas.height = img.height;
-     const ctx = canvas.getContext('2d');
-     ctx.drawImage(img, 0, 0);
- 
-     // Create a new jsPDF instance
-     const pdf = new jsPDF();
- 
-     // Add JPG image to PDF
-     pdf.addImage(canvas.toDataURL('image/jpeg'), 'JPEG', 15, 10, img.width * 0.15, img.height * 0.2); // Adjust scale as needed
- 
-     // Add HTML table content to PDF
-     pdf.html(tableHtml, {
-       callback: pdf => {
-         // Trigger download
-         const fileName = (document.getElementById('typeahead-format') as HTMLInputElement).value.trim() || 'generated_report';
-         pdf.save(`${fileName}.pdf`);
-       },
-       x: 10,
-       y: img.height * 0.25 + 50, // Adjust the Y position to leave space below the image
-       margin: [5,10,10,10],
-       html2canvas: {
-         scale: 0.11 // Adjust scale as needed
-       }
-     });
-   };
- }
-
-
-// downloadPDF() {
-//   const element = document.getElementById('report-preview');
-//   const reportNameInput = document.getElementById('typeahead-format') as HTMLInputElement;
-
-//   if (!element || !reportNameInput) {
-//     console.error('Element not found');
-//     return;
-//   }
-
-//   const originalStyle = element.style.overflow;
-//   element.style.overflow = 'visible'; // Set overflow to visible to capture entire content
-
-//   html2canvas(element, { 
-//     scrollX: 0, 
-//     scrollY: 0, 
-//     width: document.documentElement.scrollWidth, 
-//     height: document.documentElement.scrollHeight 
-//   }).then((canvas) => {
-//     const pdf = new jsPDF();
-//     // Add the image file to the PDF
-//     const img = new Image();
-//     img.src = '/assets/cover_page.jpg'; // Replace with the actual path to your image
-//     img.onload = function () {
-//       const imgWidth = 210; // Adjust as needed
-//       const imgHeight = (img.height * imgWidth) / img.width;
-//       pdf.addImage(img, 'JPEG', 0, 0, imgWidth, imgHeight);
-
-//        // Add the canvas content to the PDF
-//       const imgData = canvas.toDataURL('image/png');
-//       const canvasImgWidth =260; // Adjust as needed
-//       const canvasImgHeight = (canvas.height * canvasImgWidth) / canvas.width;
-//       pdf.addImage(imgData, 'PNG', 5, imgHeight + 10, canvasImgWidth, canvasImgHeight);
-
-//     // Reset overflow style
-//     element.style.overflow = originalStyle;
-
-//     // Download PDF with the name from the input field
-//     const fileName = reportNameInput.value.trim() || 'generated_report';
-//     pdf.save(`${fileName}.pdf`);
-//   };
-// });
-// }
 
 downloadExcel() {
   const reportData = this.generateReportLogic(this.selectedColumns);
@@ -424,7 +314,7 @@ saveBlob(blob: Blob, fileName: string) {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-}
+} 
 
 
   active = 'board';
@@ -436,11 +326,10 @@ saveBlob(blob: Blob, fileName: string) {
   slot = '';
   sectionSelected: any = {};
   stationSelected: any = {};
-  //boardList = [];
+
   sectionList = [];
-  //machineList = [];
   selectIndex: number;
-//  dataSet: any[] = [];
+  
 
   directions = [
     {
@@ -498,98 +387,64 @@ saveBlob(blob: Blob, fileName: string) {
     'FRIDAY',
     'SATURDAY',
   ];
-  
-  //boardDataset = [];
-  createReport: any;
-  username: string;
-  // constructor(
-  //   private service: AppService,
-  //   private toastService: ToastService,
-  //   private router: Router,
-  //   private ls: localStorageService
-  // ) {
-  //   let user = this.ls.getUser();
-  //   this.username = user.username;
-  //   if (user.department !== 'OPERATING') this.router.navigate(['/lmg']);
-  // }
 
-  // ngOnInit() {
-  //   Promise.resolve().then(() => {
-  //     this.service.getAllRailDetails('boards').subscribe((data) => {
-  //       this.boardDataset = data;
-  //       for (let item of data) {
-  //         this.boardList.push(item.board);
-  //       }
-  //     });
-  //   });
-  //   Promise.resolve().then(() => {
-  //     this.service.getAllRailDetails('railDetails').subscribe((data) => {
-  //       this.dataSet = data;
-  //     });
-  //   });
-  //   Promise.resolve().then(() => {
-  //     this.service.getAllRailDetails('machines').subscribe((data) => {
-  //       this.machineList = data;
-  //     });
-  //   });
+createReport: any;
+  
+OnSelectRolling(e){
+ console.log(e.target.value)
+ let title=e.target.value
+ let domain = [];
+ this.dataSet = [];
+ if (title === 'MACHINE') {
+  domain = ['machineRolls', 'machineNonRolls'];
+} else if (title === 'MAINTENANCE') {
+  domain = ['maintenanceRolls', 'maintenanceNonRolls'];
+} else if (title === 'ROLLING') {
+  domain = ['machineRolls', 'maintenanceRolls'];
+} else if (title === 'NON-ROLLING') {
+  domain = ['maintenanceNonRolls', 'machineNonRolls'];
+} else if (title === 'ROLLING / NON-ROLLING') {
+  domain = ['machineRolls', 'maintenanceRolls', 'maintenanceNonRolls', 'machineNonRolls'];
+}
+  for (let ele of domain) {
+    Promise.resolve().then(() => {
+      this.service.getAllMachineRoll(ele).subscribe((data) => {
+        data = data.map((item) => {
+
+          // Integrate values into 'item.integrates'
+          let Itemp = '';
+          for (let ele of item.integrated) { 
+          Itemp += `BLOCK: ${ele.block !== undefined ? ele.block : '-'} | SECTION: ${ele.section1 !== undefined ? ele.section1 : '-'} | DURATION: ${ele.duration !== undefined ? ele.duration : '-'}\n`;
+          }
+          item.integrates = Itemp;
+
+          // Process caution data
+          let cSpeed = '';
+          let cLength = '';
+          let cTdc = '';
+          let cTimeLoss ='';
+          for (let ele of item.caution) {
+            cLength += `${ele.length}\n`;
+            cSpeed += `${ele.speed}\n`;
+            cTdc += `${ele.tdc}\n`;
+            cTimeLoss +=ele.timeloss? `${ ele.timeloss} \n`:''; 
+          }
+          item.cautionLength = cLength;
+          item.cautionSpeed = cSpeed;
+          item.cautionTdc = cTdc;
+          item.cautionTimeLoss= cTimeLoss;
+          return item;
+        });
     
-    
-  // }
-  OnSelectRolling(e){
-    console.log(e.target.value)
-    let title=e.target.value
-    let domain = [];
-    this.dataSet = [];
-    if (title === 'MACHINE') {
-     domain = ['machineRolls', 'machineNonRolls'];
-   } else if (title === 'MAINTENANCE') {
-     domain = ['maintenanceRolls', 'maintenanceNonRolls'];
-   } else if (title === 'ROLLING') {
-     domain = ['machineRolls', 'maintenanceRolls'];
-   } else if (title === 'NON-ROLLING') {
-     domain = ['maintenanceNonRolls', 'machineNonRolls'];
-   } else if (title === 'ROLLING / NON-ROLLING') {
-     domain = ['machineRolls', 'maintenanceRolls', 'maintenanceNonRolls', 'machineNonRolls'];
-   }
-     for (let ele of domain) {
-       Promise.resolve().then(() => {
-         this.service.getAllMachineRoll(ele).subscribe((data) => {
-           data = data.map((item) => {
-   
-             // Integrate values into 'item.integrates'
-             let Itemp = '';
-             for (let ele of item.integrated) { 
-             Itemp += `BLOCK: ${ele.block !== undefined ? ele.block : '-'} | SECTION: ${ele.section1 !== undefined ? ele.section1 : '-'} | DURATION: ${ele.duration !== undefined ? ele.duration : '-'}\n`;
-             }
-             item.integrates = Itemp;
-   
-             // Process caution data
-             let cSpeed = '';
-             let cLength = '';
-             let cTdc = '';
-             let cTimeLoss ='';
-             for (let ele of item.caution) {
-               cLength += `${ele.length}\n`;
-               cSpeed += `${ele.speed}\n`;
-               cTdc += `${ele.tdc}\n`;
-               cTimeLoss +=ele.timeloss? `${ ele.timeloss} \n`:''; 
-             }
-             item.cautionLength = cLength;
-             item.cautionSpeed = cSpeed;
-             item.cautionTdc = cTdc;
-             item.cautionTimeLoss= cTimeLoss;
-             return item;
-           });
-       
-           // Update dataset and Handsontable
-           this.dataSet.push(...data);
-           
-         });
-       });
-     }
-     console.log('data---',this.dataSet)
-   
-   }
+        // Update dataset and Handsontable
+        this.dataSet.push(...data);
+        
+      });
+    });
+  }
+  console.log('data---',this.dataSet)
+
+}
 
 selectStartDate(e) {
   this.startDate = DateTime.fromISO(e.target.value);
@@ -631,6 +486,9 @@ filterDataWithDate() {
   this.filteredData = data;
 }
 
+ResetData(){
+  window.location.reload();
+}
   onSelectBoard(e) {
     this.board = e.target.value;
     this.sectionList = [];
@@ -643,7 +501,6 @@ filterDataWithDate() {
     }
     this.onSelectSection(this.sectionList[0]);
   }
-
   onSelectDepartment(event: Event): void {
     const target = event.target as HTMLSelectElement;
     // Update the selected department
@@ -865,23 +722,21 @@ filterDataWithDate() {
   }
 
   addMachine() {
-    if (this.machine == '' || this.purse == '') {
-      this.toastService.showWarning('Enter valid details');
+    if (this.machine == '') {
+      this.toastService.showWarning('enter valid Details');
       return;
     }
     if (this.machineList.includes(this.machine)) {
-      this.toastService.showDanger(this.machine + ' already exists');
+      this.toastService.showDanger(this.machine + ' is already existed');
       return;
     }
-    const payload = { machine: this.machine, purse: this.purse };
+    const payload = { machine: this.machine };
     this.service.addRailDetails('machines', payload).subscribe((res) => {
-      this.toastService.showSuccess('Successfully submitted');
+      this.toastService.showSuccess('successfully submitted');
       this.machineList.push(res);
       this.machine = '';
-      this.purse = '';
     });
   }
-
 
   onDeleteBoard(data) {
     const confirmDelete = confirm(
@@ -1093,25 +948,21 @@ filterDataWithDate() {
 
   editMachine(data, index) {
     const renameMachine = prompt('Rename the Machine:', data.machine);
-    const renamePurse = prompt('Rename the Purse:', data.purse);
-    if (renameMachine === null || renameMachine === data.machine){ 
-      if (renamePurse === null || renamePurse === data.purse) {
+    if (renameMachine === null || renameMachine === data.machine) {
       return;
     }
-  }
+
     const payload = {
-      machine: renameMachine !== null ? renameMachine: data.machine,
-      purse: renamePurse !== null ? renamePurse: data.purse
+      machine: renameMachine,
     };
 
     this.service
       .updateRailDetails('machines', data._id, payload)
       .subscribe((res) => {
         this.machineList[index] = res;
-        this.toastService.showSuccess('Successfully Updated');
+        this.toastService.showSuccess('successfully Updated');
       });
   }
-
   onTabChange() {
     this.board = '';
     this.section = '';
@@ -1166,5 +1017,9 @@ function generateReportLogic(selectedColumns: string[]): any {
 }
 
 function downloadPDF() {
+  throw new Error('Function not implemented.');
+}
+
+function saveAs(blob: Blob, arg1: string) {
   throw new Error('Function not implemented.');
 }

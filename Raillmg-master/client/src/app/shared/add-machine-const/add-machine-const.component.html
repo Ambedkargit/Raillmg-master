@@ -248,6 +248,7 @@
                                               [settings]="dropdownSettings"
                                               [data]="getMachineNames()"
                                               (onSelect)="onMachineSelected($event)"
+                                              (onDeSelect)="onMachineDeselected($event)"
                                               formControlName="machine">
                                             </ng-multiselect-dropdown>
                                           </div>
@@ -414,7 +415,7 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="col-sm-6 col-md-8">
+                                        <div class="col-sm-9 col-md-6">
                                             <div class="form-group mt-3 mb-3">
                                                 <input type="checkbox" formControlName="integratedCheckbox" />
                                                 <label>INTEGRATED BLOCK</label>
@@ -424,10 +425,7 @@
                                                     <div class="col-3">SECTION</div>
                                                     
                                                     <div class="col-3">DURATION</div>
-                                                    <div class="col-2">
-                                                        <button type="button" class="btn btn-outline-primary"
-                                                            (click)="addIntegrated(i)">+</button>
-                                                    </div>
+                                                    
                                                 </div>
                                                 <div class="row text-center"
                                                     *ngFor="let integrated of integrates[i]; let $index = index"
@@ -447,10 +445,14 @@
                                                             placeholder="ENTER DURATION OF INTEGRATED" name="duration"
                                                             (change)="integratedDuration($event,i,$index)" required />
                                                     </div>
-                                                    <div class="col-2 p-0">
+                                                    <div class="col-2">
+                                                        <button type="button" class="btn btn-outline-primary"
+                                                            (click)="addIntegrated(i)">+</button>
+                                                    </div>
+                                                    <!-- <div class="col-2 p-0">
                                                         <button type="button" class="btn btn-outline-danger"
                                                             (click)="deleteIntegrated(i,$index)">x</button>
-                                                    </div>
+                                                    </div> -->
                                                 </div>
                                                 }
                                                 <!-- @if(machineFormArray.controls[i].get('integratedCheckbox').value){
@@ -472,7 +474,7 @@
                                                 } -->
                                             </div>
                                         </div>
-                                        <div class="col-sm-6 col-md-2">
+                                        <div class="col-sm-6 col-md-3">
                                             <div class="form-group mt-3 mb-3">
                                                 <input type="checkbox" formControlName="locoCheckbox" />
                                                 <label>No. Of Loco Required</label>
@@ -483,7 +485,7 @@
                                                 }
                                             </div>
                                         </div>
-                                        <div class="col-sm-6 col-md-2">
+                                        <div class="col-sm-6 col-md-3">
                                             <div class="form-group mt-3 mb-3">
                                                 <input type="checkbox" formControlName="crewCheckbox" />
                                                 <label>No. Of Crew Required</label>
@@ -494,7 +496,7 @@
                                                 }
                                             </div>
                                         </div>
-                                        <div class="col-12">
+                                        <div class="col-13">
                                             <div class="form-group mt-3 mb-3">
                                                 <input type="checkbox" formControlName="cautionCheckbox" />
                                                 <label>CAUTION REQUIRED</label>
@@ -502,12 +504,12 @@
                                                     <div class="row align-items-center">
                                                         <div class="col-2">Length</div>
                                                         <div class="col-2">TDC</div>
-                                                        <div class="col-1">Speed</div> <!-- Reduced width for Speed -->
+                                                        <div class="col-2">Speed</div> <!-- Reduced width for Speed -->
                                                         <div class="col-1">MPS</div>
                                                         <div class="col-2">ID</div> <!-- Increased width for ID -->
                                                         <div class="col-2">Time Loss</div> <!-- Added column for Time Loss -->
                                                     
-                                                        <div class="col-2">
+                                                        <div class="col-1">
                                                             <button type="button" class="btn btn-outline-primary" (click)="addCaution(i)">+</button>
                                                         </div>
                                                     </div>
@@ -518,7 +520,7 @@
                                                         <div class="col-2 p-0 pe-1">
                                                             <input type="date" class="form-control" placeholder="ENTER TDC OF CAUTION" name="tdc" (change)="cautionTDC($event,i,$index)" required />
                                                         </div>
-                                                        <div class="col-1 p-0 pe-1"> <!-- Reduced width for Speed -->
+                                                        <div class="col-2 p-0 pe-1"> <!-- Reduced width for Speed -->
                                                             <input type="number" class="form-control" placeholder="ENTER SPEED OF CAUTION" name="speed" (change)="cautionSpeed($event,i,$index)" required />
                                                         </div>
                                                         <div class="col-1 p-0 pe-1">
@@ -537,7 +539,7 @@
                                                             </div>
                                                         </div>
                                                         
-                                                        <div class="col-2">
+                                                        <div class="col-1">
                                                             <button type="button" class="btn btn-outline-danger" (click)="deleteCaution(i,$index)">x</button>
                                                         </div>
                                                     </div>

@@ -33,6 +33,7 @@ export class MachineRollComponent implements OnInit {
     'all-rolling': 'ALL-ROLLING BLOCK',
     'all-non-rolling': 'ALL-NON-ROLLING BLOCK',
   };
+  machineList: any[] = []; 
   id = 'hotInstance';
   dataset: any = [];
   startDate: any;
@@ -70,6 +71,7 @@ export class MachineRollComponent implements OnInit {
         Promise.resolve().then(() => {
           this.service.getAllMachineRoll(ele).subscribe((data) => {
             const hot = this.hotRegisterer.getInstance(this.id);
+            const purseValueMap: { [key: string]: number } = {};
             data = data.map((item) => {
 
               // Integrate values into 'item.integrates'
@@ -95,24 +97,33 @@ export class MachineRollComponent implements OnInit {
               item.cautionTdc = cTdc;
               item.cautionTimeLoss = cTimeLoss;
 
-              // Update remaining purse
-            const purseString = item.purse;
-            let remainPurse = null;
-  
-            if (purseString && purseString.includes(':')) {
-              const purseValueString = purseString.split(':')[1].trim();
-              const purseValue = parseFloat(purseValueString);
-  
-              if (!isNaN(purseValue)) {
-                const timeGrantedValue = parseFloat(item.time_granted);
-  
-                if (!isNaN(timeGrantedValue)) {
-                  remainPurse = (purseValue * 60) - timeGrantedValue;
-                }
-              }
-            }
-  
-            item.remain_purse = remainPurse;
+             // Update remaining purse
+         const purseString = item.purse;
+         let remainPurse = null;
+
+         if (purseString && purseString.includes(':')) {
+           const purseValueString = purseString.split(':')[1].trim();
+           const purseValue = parseFloat(purseValueString);
+
+           if (!isNaN(purseValue)) {
+             const timeGrantedValue = parseFloat(item.time_granted);
+
+             if (!isNaN(timeGrantedValue)) {
+               const machineType = item.machine;
+               const prevRemainPurse = purseValueMap[machineType] || null;
+
+               if (prevRemainPurse !== null) {
+                 remainPurse = prevRemainPurse - timeGrantedValue;
+               } else {
+                 remainPurse = (purseValue) - timeGrantedValue;
+               }
+
+               purseValueMap[machineType] = remainPurse;
+             }
+           }
+         }
+
+         item.remain_purse = remainPurse;
 
               return item;
             });
@@ -151,14 +162,8 @@ export class MachineRollComponent implements OnInit {
         //   // Push total row to the end of data array
         //   data.push(totalRow);
 
-         
-
-
-           
-
-// Update Handsontable with the updated data
-hot.updateData(data);
-
+        // Update Handsontable with the updated data
+          hot.updateData(data);
           }); 
         });
         
@@ -166,6 +171,10 @@ hot.updateData(data);
     });
   }
 
+  getRemainPurse(machineName: string): number | undefined {
+    const machine = this.machineList.find(m => m.machine === machineName);
+    return machine ? machine.remain_purse : undefined;
+  }
   onExcelDownload() {
     const hot = this.hotRegisterer.getInstance(this.id);
     const exportPlugin = hot.getPlugin('exportFile');

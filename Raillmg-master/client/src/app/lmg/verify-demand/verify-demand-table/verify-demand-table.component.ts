@@ -95,21 +95,24 @@ export class VerifyDemandTableComponent implements OnInit {
     { data: 'lineNo', title: 'LINE', width: 60 },
     { data: 'typeOfWork', title: 'TYPE OF WORK', width: 120 },
     { data: 'machine', title: 'MACHINE TYPE', width: 120 },
-    { data: 'block_start', title: 'BLOCK START', width: 120 },
-    { data: 'block_end', title: 'BLOCK END', width: 100 },
-    { data: 'time_granted', title: 'TIME GRANTED', width: 120 },
-    { data: 'time_burst', title: 'BURST TIME', width: 100 },
+    { data: 'purse', title: 'PURSE TIME', width: 100 },
+    { data: 'remain_purse', title: 'REMAIN PURSE', width: 140, editor: 'false', readOnly: true },
+    // { data: 'block_start', title: 'BLOCK START', width: 120 },
+    // { data: 'block_end', title: 'BLOCK END', width: 100 },
+    { data: 'block_times', title: 'BLOCK TIME', width: 120 },
+    { data: 'time_granted', title: 'TIME GRANTED', width: 120, editor: 'false', readOnly: true },
+    { data: 'time_burst', title: 'BURST TIME', width: 100, editor: 'false', readOnly: true },
     { data: 'output', title: 'OUTPUT', width: 120 },
     { data: 'quantum', title: 'QUANTUM', width: 120 },
     { data: 'series', title: 'SERIES', width: 80 },
-    { data: 'avl_start', title: 'SLOT START', width: 100 },
-    { data: 'avl_end', title: 'SLOT END', width: 90 },
-    { data: 'avl_duration', title: 'AVL DUR...', width: 100 },
+    { data: 'avl_start', title: 'SLOT START', width: 100, editor: 'false', readOnly: true },
+    { data: 'avl_end', title: 'SLOT END', width: 90, editor: 'false', readOnly: true },
+    { data: 'avl_duration', title: 'AVL DUR...', width: 100, editor: 'false', readOnly: true },
     { data: 'dmd_duration', title: 'DMD DUR...', width: 100 },
     { data: 'loco', title: 'LOCO', width: 70 },
     { data: 'crew', title: 'CREW', width: 70 },
     { data: 's_tStaff', title: 'S&T STAFF', width: 90 },
-    { data: 'tpcStaff', title: 'TPC STAFF', width: 90 },
+    { data: 'tpcStaff', title: 'TRD STAFF', width: 90 },
     { data: 'remarks', title: ' REMARKS', width: 90 },
   //  {
   //    data: 'burst',
@@ -161,15 +164,15 @@ export class VerifyDemandTableComponent implements OnInit {
       title: 'TIME LOSS',
       width: 120, 
     },
-    {
-      data: 'grant_status',
-      title: 'GRANT STATUS',
-      type: 'select',
-      selectOptions: ['Pending', 'Granted', 'Not Granted'],
-      width: 120,
-    },
+    // {
+    //   data: 'grant_status',
+    //   title: 'GRANT STATUS',
+    //   type: 'select',
+    //   selectOptions: ['Pending', 'Granted', 'Not Granted'],
+    //   width: 120,
+    // },
     
-    { data: 'slots', title: 'SLOTS', width: 120 },
+    // { data: 'slots', title: 'SLOTS', width: 120 },
    
     { data: 'OPTG_remarks', title: 'OPTG Remarks', width: 120 },
     { data: 'rollfrom', title: 'ROLL FROM', width: 180 },
@@ -244,7 +247,7 @@ export class VerifyDemandTableComponent implements OnInit {
         }
 
         let id = hot.getDataAtRow(row)[0];
-        const url = hot.getDataAtRow(row)[40];
+        const url = hot.getDataAtRow(row)[39];
         console.log(hot.getDataAtRow(row));
         if (oldValue == newValue || (newValue == '' && oldValue == undefined)) {
           return;
@@ -339,6 +342,7 @@ export class VerifyDemandTableComponent implements OnInit {
     Promise.resolve().then(() => {
       for (let url of fetchUrl) {
         this.service.getAllMachineRoll(url).subscribe((data) => {
+          const purseValueMap: { [key: string]: number } = {};
           data = data.map((item) => {
             if (item.status == undefined || item.status == '') {
               item.status = 'CHOOSE STATUS';
@@ -369,6 +373,34 @@ export class VerifyDemandTableComponent implements OnInit {
             item.cautionSpeed = cSpeed;
             item.cautionTdc = cTdc;
             item.cautionTimeLoss=cTimeLoss;
+               
+        // Update remaining purse
+         const purseString = item.purse;
+         let remainPurse = null;
+
+         if (purseString && purseString.includes(':')) {
+           const purseValueString = purseString.split(':')[1].trim();
+           const purseValue = parseFloat(purseValueString);
+
+           if (!isNaN(purseValue)) {
+             const timeGrantedValue = parseFloat(item.time_granted);
+
+             if (!isNaN(timeGrantedValue)) {
+               const machineType = item.machine;
+               const prevRemainPurse = purseValueMap[machineType] || null;
+
+               if (prevRemainPurse !== null) {
+                 remainPurse = prevRemainPurse - timeGrantedValue;
+               } else {
+                 remainPurse = (purseValue) - timeGrantedValue;
+               }
+
+               purseValueMap[machineType] = remainPurse;
+             }
+           }
+         }
+
+         item.remain_purse = remainPurse;
             return item;
           
           });

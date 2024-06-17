@@ -5,7 +5,8 @@ import { Injectable } from '@angular/core';
 })
 export class MachinePurseService {
   machinePurseData: {
-    machine: string, purse: string 
+    machine: string,
+    purse: string 
 }[] = [];
 
   constructor() { }

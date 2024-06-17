@@ -15,7 +15,7 @@ export class ToastService {
     toasts: Toast[] = [];
 
     showAlert(template: string) {
-        this.toasts.push({ template, classname: 'bg-alert text-light', delay: 5000 });
+        this.toasts.push({ template, classname: 'bg-alert text-success', delay: 5000 });
     }
 
     remove(toast) {

@@ -7,7 +7,7 @@ export interface IMachineRoll {
   stationFrom: string;
   direction: string;
   lineNo: string;
-  machine: string;
+  machine: string[];
   block: string;
   duration: number;
   section1: string;
@@ -40,7 +40,7 @@ export interface IMachineRoll {
   block_times: string;
   time_granted: number;
   time_burst: number;
-  burst: string;
+  // burst: string;
   caution: [];
   cancelTrain: string;
   integrated: any[];
@@ -57,9 +57,9 @@ export interface IMachineRoll {
   fit_time: string;
   a: number;
   b: number;
-  machinepurse: string;
+  machinepurse: string[];
   purse: string;
-  remain_purse: string;
+  remain_purse: number;
   block_type: string;
   rolling_stock: string;
 }

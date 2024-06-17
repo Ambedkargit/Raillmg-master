@@ -7,7 +7,7 @@ import { NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
   standalone: true,
   imports: [NgbToastModule],
   templateUrl: './toast.component.html',
-  host: { class: 'toast-container position-fixed top-0 end-0 p-3', style: 'z-index: 1200' },
+  host: { class: 'toast-container position-fixed top-10 end-0 p-3', style: 'z-index: 1200' },
   styleUrl: './toast.component.css'
 })
 export class ToastComponent {

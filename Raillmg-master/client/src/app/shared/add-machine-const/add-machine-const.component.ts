@@ -33,6 +33,7 @@ import { MachinePurseService } from '../constants/machine-purse.service';
 import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { workTypeList } from '../constants/workTypeList';
+
 @Component({
   selector: 'app-add-machine-const',
   standalone: true,
@@ -210,20 +211,47 @@ index: any;
       this.machinePurseService.machinePurseData.push(selectedCombo);
       this.form.get('machine')?.setValue(selectedCombo.machine);
       this.form.get('purse')?.setValue(selectedCombo.purse);
-      (document.getElementById('purse') as HTMLInputElement).value = (document.getElementById('purse') as HTMLInputElement).value + selectedCombo.purse + ",";
+      this.updatePurseInput(selectedCombo.purse);
+    }
+    // this.toastService.showAlert(`Machine: ${selectedCombo.machine} Purse : ${selectedCombo.purse}`);
+  }
+
+  onMachineDeselected(item: ListItem): void {
+    const machineName = item.toString();
+    const index = this.machinePurseService.machinePurseData.findIndex(combo => combo.machine === machineName);
+    if (index !== -1) {
+      const deselectedCombo = this.machinePurseService.machinePurseData[index];
+      this.machinePurseService.machinePurseData.splice(index, 1);
+      this.form.get('machine')?.setValue('');
+      this.form.get('purse')?.setValue('');
+      this.removePurseFromInput(deselectedCombo.purse);
+      // this.toastService.showAlert(`Machine: ${deselectedCombo.machine} Purse: ${deselectedCombo.purse} removed`);
     }
   }
+
+  updatePurseInput(purse: string): void {
+    const purseInput = document.getElementById('purse') as HTMLInputElement;
+    purseInput.value += purse + ', ';
+  }
+
+  removePurseFromInput(purse: string): void {
+    const purseInput = document.getElementById('purse') as HTMLInputElement;
+    const purses = purseInput.value.split(',').map(p => p.trim()).filter(p => p !== purse && p !== '');
+    purseInput.value = purses.join(', ') + (purses.length > 0 ? ', ' : '');
+  }
+
   // Assuming you have a form initialization method
   initializeForm(): void {
     this.form = this.fb.group({
       machine: ['', Validators.required],
+      purse: [''],
       machineFormArray: this.fb.array([this.createMachineFormGroup()])
     });
   }
 
   createMachineFormGroup(): FormGroup {
     return this.fb.group({
-      purse: ['', Validators.required]
+      purse: ['']
     });
   }
 
@@ -270,14 +298,14 @@ index: any;
     }
     //  add for Alert at tpc staff required
 
-    const userDepartment = this.authGuard.getUserDepartment();
+    // const userDepartment = this.authGuard.getUserDepartment();
 
-    const hasTPCStaff = this.machineFormArray.value.some(item => item.tpcStaff === "Yes");
-    const hasS_TStaff = this.machineFormArray.value.some(item => item.s_tStaff === "Yes");
+    // const hasTPCStaff = this.machineFormArray.value.some(item => item.tpcStaff === "Yes");
+    // const hasS_TStaff = this.machineFormArray.value.some(item => item.s_tStaff === "Yes");
 
-    if (hasTPCStaff || hasS_TStaff) {
-        sessionStorage.setItem('showAlert', 'true');
-    }
+    // if (hasTPCStaff || hasS_TStaff) {
+    //     sessionStorage.setItem('showAlert', 'true');
+    // }
 
 
     let payload = [];
@@ -318,16 +346,18 @@ index: any;
 
         const dt = DateTime.now();
         const startTime = DateTime.fromFormat(splitSlot[1], 'HH:mm');
-        const endTime = DateTime.fromFormat(splitSlot[3], 'HH:mm');
-        const timeDifferenceInMinutes = endTime.diff(
-          startTime,
-          'minutes'
-        ).minutes;
+        let endTime = DateTime.fromFormat(splitSlot[3], 'HH:mm');
+        if (endTime < startTime) {
+          // Add a day to endTime if it is less than startTime
+          endTime = endTime.plus({ days: 1 });
+        }
 
+        let timeDifferenceInMinutes = endTime.diff(startTime, 'minutes').minutes;
+        timeDifferenceInMinutes = Math.max(timeDifferenceInMinutes, 0);
         // item.machine = item.machine.map((item) => {
         //   return item.machine.trim();
         // });
-
+        
         payload.push({
           ...item,
           avl_start: splitSlot[1],

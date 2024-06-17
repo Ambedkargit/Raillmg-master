@@ -175,7 +175,7 @@ export const columns: Handsontable.ColumnSettings[] = [
   { data: 'remain_purse', title: 'REMAIN PURSE', width: 140, editor: 'false', readOnly: true },
   // { data: 'block_start', title: 'BLOCK START', width: 120 },
   // { data: 'block_end', title: 'BLOCK END', width: 100 },
-  { data: 'block_times', title: 'BLOCK TIME', width: 110 },
+  { data: 'block_times', title: 'BLOCK TIME', width: 120 },
   { data: 'time_granted', title: 'TIME GRANTED', width: 120, editor: 'false', readOnly: true },
   { data: 'time_burst', title: 'BURST TIME', width: 100, editor: 'false', readOnly: true },
   { data: 'output', title: 'OUTPUT', width: 100 },
@@ -183,7 +183,7 @@ export const columns: Handsontable.ColumnSettings[] = [
   { data: 'avl_start', title: ' SLOT START', width: 100, editor: 'false', readOnly: true },
   { data: 'avl_end', title: ' SLOT END', width: 90, editor: 'false', readOnly: true },
   { data: 'avl_duration', title: 'AVL DUR...', width: 100, editor: 'false', readOnly: true },
-  { data: 'dmd_duration', title: 'DMD DUR...', width: 100, editor: 'false', readOnly: true },
+  { data: 'dmd_duration', title: 'DMD DUR...', width: 100 },
   
   
   // { data: 'ni', title: ' NI/Non-NI Work', width: 130 },
@@ -204,7 +204,7 @@ export const columns: Handsontable.ColumnSettings[] = [
   { data: 'remarks', title: ' REMARKS', width: 90 },
   // { data: 'approval', title: 'APPROVAL', width: 90 },
   { data: 's_tStaff', title: 'S&T STAFF', width: 90 },
-  { data: 'tpcStaff', title: 'TPC STAFF', width: 90 },
+  { data: 'tpcStaff', title: 'TRD STAFF', width: 90 },
   // { data: 'point', title: 'POINT/BPAC/O..', width: 130 },
   // { data: 'tower', title: 'TOWER/MAT...', width: 110 },
   // { data: 'cancelTrain', title: 'TRAIN CANCEL...', width: 130 },
