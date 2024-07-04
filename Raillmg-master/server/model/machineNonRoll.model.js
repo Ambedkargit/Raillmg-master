@@ -44,7 +44,7 @@ const machineNonRollSchema = new mongoose.Schema({
     //burst: { type: String, default: 'Block Ended on Time' },
     grant_status: { type: String, default: 'Pending' },
     block_times: {type: String},
-    time_granted: { type: Number},
+    time_granted: { type: String},
     time_burst: {type: Number},
     status: { type: String },
     Avl_status: { type: Boolean, default: true },
